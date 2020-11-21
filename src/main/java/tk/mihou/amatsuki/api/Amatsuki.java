@@ -12,7 +12,7 @@ import java.util.concurrent.CompletableFuture;
 public class Amatsuki {
 
     private AmatsukiConnector connector = new AmatsukiConnector();
-    private int defTimeout = 30000;
+    private int defTimeout = 5000;
 
     /**
      * Searches and retrieves a list of users.

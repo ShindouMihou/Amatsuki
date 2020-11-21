@@ -16,7 +16,7 @@ public class UserResults {
     public UserResults(String name, String url, String avatar) {
         this.name = name;
         this.url = url;
-        this.avatar = avatar;
+        this.avatar = avatar.replace("https://cdn.scribblehub.com/avatar/s/", "https://cdn.scribblehub.com/avatar/l/");
     }
 
     /**
@@ -36,7 +36,7 @@ public class UserResults {
     }
 
     /**
-     * Gets the link avatar of the user, may be super small resolution as SH search results hand such.
+     * Gets the link avatar of the user, large image not thumbnail size.
      * @return image link.
      */
     public String getAvatar() {

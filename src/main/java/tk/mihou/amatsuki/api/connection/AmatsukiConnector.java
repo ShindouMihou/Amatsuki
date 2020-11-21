@@ -24,6 +24,7 @@ import java.util.concurrent.Executors;
 public class AmatsukiConnector {
 
     private ExecutorService executorService = Executors.newSingleThreadExecutor();
+    private String userAgent = "Amatsuki-library/1.0.7 (Language=Java/1.8)";
 
     /*
     - Amatsuki Connector, the base connector for all.
@@ -43,12 +44,23 @@ public class AmatsukiConnector {
     - It is limited as one would expect, but it does the job right.
      */
 
+    /**
+     * Modifies the user-agent of the client, can be anything but I recommend not abusing, as well as using the right
+     * practices.
+     * @param userAgent the user agent.
+     */
+    public void setUserAgent(String userAgent){
+        this.userAgent = userAgent;
+    }
+
     public CompletableFuture<Optional<List<UserResults>>> searchUser(String query, int timeout){
         return CompletableFuture.supplyAsync(() -> {
             try {
                 List<UserResults> collection = new ArrayList<>();
                 Document doc = Jsoup.connect(String.format("https://www.scribblehub.com/?s=%s&post_type=fictionposts", query))
-                        .referrer("https://scribblehub.com").timeout(timeout).get();
+                        .referrer("https://scribblehub.com")
+                        .userAgent(userAgent)
+                        .timeout(timeout).get();
                 doc.getElementsByClass("sb_box search").forEach(element -> element.getElementsByClass("s_user_link").forEach(resultA -> resultA.getElementsByClass("s_user_results").forEach(results -> {
                     UserResultBuilder builder = new UserResultBuilder();
                     Element e = results.getElementsByClass("sur_image").first().getElementsByTag("img").first();
@@ -58,8 +70,7 @@ public class AmatsukiConnector {
                     collection.add(builder.build());
                 })));
                 return collection.isEmpty() ? Optional.empty() : Optional.of(collection);
-            } catch (IOException e) {
-                e.printStackTrace();
+            } catch (IOException ignore) {
             }
             return Optional.empty();
         });
@@ -71,7 +82,9 @@ public class AmatsukiConnector {
                 List<StoryResults> stories = new ArrayList<>();
                 ArrayList<String> thumbnails = new ArrayList<>();
                 Document doc = Jsoup.connect(String.format("https://www.scribblehub.com/?s=%s&post_type=fictionposts", query))
-                        .referrer("https://scribblehub.com").timeout(timeout).get();
+                        .referrer("https://scribblehub.com")
+                        .userAgent(userAgent)
+                        .timeout(timeout).get();
                 doc.getElementsByClass("search_main_box").forEach(element -> element.getElementsByClass("search_img").forEach(searchImg -> thumbnails.add(searchImg.getElementsByTag("img").attr("src"))));
                 IntegerBuilder i = new IntegerBuilder(0);
                 doc.getElementsByClass("search_body").forEach(elemental -> elemental.getElementsByClass("search_title").forEach(searchTitle -> {
@@ -84,8 +97,7 @@ public class AmatsukiConnector {
                     i.add(1);
                 }));
                 return stories.isEmpty() ? Optional.empty() : Optional.of(stories);
-            } catch (IOException e) {
-                e.printStackTrace();
+            } catch (IOException ignore) {
             }
             return Optional.empty();
         }, executorService);
@@ -96,7 +108,9 @@ public class AmatsukiConnector {
             try {
                 StoryBuilder entity = new StoryBuilder();
                 Document doc = Jsoup.connect(url)
-                        .referrer("https://scribblehub.com").timeout(timeout).get();
+                        .referrer("https://scribblehub.com")
+                        .userAgent(userAgent)
+                        .timeout(timeout).get();
                 Elements metaTags = doc.getElementsByTag("meta");
                 Elements link = doc.getElementsByTag("link");
                 Elements views = doc.getElementsByClass("fic_stats");
@@ -145,8 +159,7 @@ public class AmatsukiConnector {
                     }
                 });
                 return Optional.of(entity.build());
-            } catch (IOException ex) {
-                ex.printStackTrace();
+            } catch (IOException ignore) {
             }
             return Optional.empty();
         }, executorService);
@@ -157,7 +170,9 @@ public class AmatsukiConnector {
             UserBuilder builder = new UserBuilder();
             try {
                 Document doc = Jsoup.connect(url)
-                        .referrer("https://scribblehub.com").timeout(timeout).get();
+                        .referrer("https://scribblehub.com")
+                        .userAgent(userAgent)
+                        .timeout(timeout).get();
                 builder.setBio(doc.getElementsByClass("user_bio_profile").text());
                 doc.getElementsByClass("site-content-contain profile").forEach(element -> element.getElementsByTag("meta").forEach(meta -> {
                     switch (meta.attr("property")) {
@@ -197,8 +212,7 @@ public class AmatsukiConnector {
                 }));
                 builder.setUrl(url);
                 return Optional.of(builder.build());
-            } catch (IOException e) {
-                e.printStackTrace();
+            } catch (IOException ignore) {
             }
             return Optional.empty();
         }, executorService);
