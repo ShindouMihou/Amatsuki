@@ -1,6 +1,51 @@
+[![](https://jitpack.io/v/ShindouMihou/amatsuki.svg)](https://jitpack.io/#ShindouMihou/amatsuki)
 # Amatsuki
+
 A simple scraper for ScribbleHub built in Java, for searching stories, users or collecting information of those two using either keywords, or URLs.
 - Built in Java, meant for a Discord bot.
+
+## How to add.
+
+As of now, the only way to get this is through Jitpack which is still a simple way.
+Step 1. Add the JitPack repository to your build file
+
+- Maven
+Step 1. Add the JitPack repository to your build file
+```
+	<repositories>
+		<repository>
+		    <id>jitpack.io</id>
+		    <url>https://jitpack.io</url>
+		</repository>
+	</repositories>
+  ```
+Step 2. Add the dependency
+```
+	<dependency>
+	    <groupId>com.github.ShindouMihou</groupId>
+	    <artifactId>amatsuki</artifactId>
+	    <version>Tag</version>
+	</dependency>
+  ```
+  
+- Gradle
+Step 1. Add it in your root build.gradle at the end of repositories:
+```
+	allprojects {
+		repositories {
+			...
+			maven { url 'https://jitpack.io' }
+		}
+	}
+```
+Step 2. Add the dependency:
+```
+	dependencies {
+	        implementation 'com.github.ShindouMihou:amatsuki:Tag'
+	}
+  ```
+  
+ - Tag refers to version.
 
 ## How to use?
 
