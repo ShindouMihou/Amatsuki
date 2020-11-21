@@ -4,6 +4,8 @@ import tk.mihou.amatsuki.api.Amatsuki;
 import tk.mihou.amatsuki.entities.story.Story;
 
 import java.util.Objects;
+import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
 
 public class StoryResults {
 
@@ -28,11 +30,11 @@ public class StoryResults {
     }
 
     /**
-     * Transforms the result into a story, uses blind .get() as we already know the URL will give results.
+     * Transforms the result into a story, returns a CompletableFuture<Optional> to prevent mishaps.
      * @return Story.
      */
-    public Story transformToStory(){
-        return new Amatsuki().getStoryFromUrl(url).get();
+    public CompletableFuture<Optional<Story>> transformToStory(){
+        return new Amatsuki().getStoryFromUrl(url);
     }
 
     /**

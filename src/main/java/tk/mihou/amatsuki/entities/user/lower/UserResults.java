@@ -4,6 +4,8 @@ import tk.mihou.amatsuki.api.Amatsuki;
 import tk.mihou.amatsuki.entities.user.User;
 
 import java.util.Objects;
+import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
 
 public class UserResults {
 
@@ -42,11 +44,11 @@ public class UserResults {
     }
 
     /**
-     * Transforms a result into a user, uses blind .get() as we already know the URL will give out results.
+     * Transforms a result into a user, returns a CompletableFuture<Optional> to prevent mishaps.
      * @return User.
      */
-    public User transformToUser(){
-        return new Amatsuki().getUserFromUrl(url).get();
+    public CompletableFuture<Optional<User>> transformToUser(){
+        return new Amatsuki().getUserFromUrl(url);
     }
 
     @Override
