@@ -14,6 +14,9 @@ import tk.mihou.amatsuki.entities.user.User;
 import tk.mihou.amatsuki.entities.user.UserBuilder;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -57,7 +60,7 @@ public class AmatsukiConnector {
         return CompletableFuture.supplyAsync(() -> {
             try {
                 List<UserResults> collection = new ArrayList<>();
-                Document doc = Jsoup.connect(String.format("https://www.scribblehub.com/?s=%s&post_type=fictionposts", query))
+                Document doc = Jsoup.connect(String.format("https://www.scribblehub.com/?s=%s&post_type=fictionposts", encodeValue(query)))
                         .referrer("https://scribblehub.com")
                         .userAgent(userAgent)
                         .timeout(timeout).get();
@@ -81,7 +84,7 @@ public class AmatsukiConnector {
             try {
                 List<StoryResults> stories = new ArrayList<>();
                 ArrayList<String> thumbnails = new ArrayList<>();
-                Document doc = Jsoup.connect(String.format("https://www.scribblehub.com/?s=%s&post_type=fictionposts", query))
+                Document doc = Jsoup.connect(String.format("https://www.scribblehub.com/?s=%s&post_type=fictionposts", encodeValue(query)))
                         .referrer("https://scribblehub.com")
                         .userAgent(userAgent)
                         .timeout(timeout).get();
@@ -216,6 +219,14 @@ public class AmatsukiConnector {
             }
             return Optional.empty();
         }, executorService);
+    }
+
+    private static String encodeValue(String value) {
+        try {
+            return URLEncoder.encode(value, StandardCharsets.UTF_8.toString());
+        } catch (UnsupportedEncodingException ex) {
+            throw new RuntimeException(ex.getCause());
+        }
     }
 
     static class IntegerBuilder {
