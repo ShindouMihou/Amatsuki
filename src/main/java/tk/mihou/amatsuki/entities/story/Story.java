@@ -10,14 +10,14 @@ public class Story {
     private final String image;
     private final String creator;
     private final Double rating;
-    private final String views, favorites;
+    private final long views, favorites;
     private final int chapters;
     private final int chw;
     private final int readers;
     private final int ratings;
 
-    public Story(String title, String synopsis, String url, String image, String creator, Double rating, String views,
-                 String favorites, int chapters, int chw, int ratings, int readers) {
+    public Story(String title, String synopsis, String url, String image, String creator, Double rating, long views,
+                 long favorites, int chapters, int chw, int ratings, int readers) {
         this.title = title;
         this.synopsis = synopsis;
         this.url = url;
@@ -84,7 +84,7 @@ public class Story {
      * Gets the total view count of the story.
      * @return the total view count of the story.
      */
-    public String getViews() {
+    public long getViews() {
         return views;
     }
 
@@ -92,7 +92,7 @@ public class Story {
      * Gets the total favorites of the story.
      * @return the total favorites of the story.
      */
-    public String getFavorites() {
+    public long getFavorites() {
         return favorites;
     }
 

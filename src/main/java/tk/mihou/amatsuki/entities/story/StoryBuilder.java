@@ -4,7 +4,7 @@ public class StoryBuilder {
 
     private String title, synopsis, url, image, creator;
     private Double rating;
-    private String views, favorites;
+    private long views, favorites;
     private int chapters, chapterPerWeek, ratings, readers;
 
     public void setTitle(String title) {
@@ -32,11 +32,11 @@ public class StoryBuilder {
     }
 
     public void setViews(String views) {
-        this.views = views;
+        this.views = Long.parseLong(views);
     }
 
     public void setFavorites(String favorites) {
-        this.favorites = favorites;
+        this.favorites = Long.parseLong(favorites);
     }
 
     public void setChapters(int chapters) {
