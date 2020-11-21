@@ -78,5 +78,3 @@ new Amatsuki().searchUser("Mihou", 30000); // Timeout is in millis.
 
 #### Known issues
 Here are the currently known issues that will be fixed soon.
-
-1. Story's values are String instead of Numerical, this is an issue on my side as I forgot to change them after taking them from my Discord bot.
