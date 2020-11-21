@@ -2,9 +2,9 @@ package tk.mihou.amatsuki.entities.story;
 
 public class StoryBuilder {
 
-    private String title, synopsis, url, image, creator;
+    private String title, synopsis, url, image, creator, views;
     private Double rating;
-    private long views, favorites;
+    private long favorites;
     private int chapters, chapterPerWeek, ratings, readers;
 
     public void setTitle(String title) {
@@ -32,7 +32,7 @@ public class StoryBuilder {
     }
 
     public void setViews(String views) {
-        this.views = Long.parseLong(views);
+        this.views = views;
     }
 
     public void setFavorites(String favorites) {

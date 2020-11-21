@@ -9,14 +9,15 @@ public class Story {
     private final String url;
     private final String image;
     private final String creator;
+    private final String views;
     private final Double rating;
-    private final long views, favorites;
+    private final long favorites;
     private final int chapters;
     private final int chw;
     private final int readers;
     private final int ratings;
 
-    public Story(String title, String synopsis, String url, String image, String creator, Double rating, long views,
+    public Story(String title, String synopsis, String url, String image, String creator, Double rating, String views,
                  long favorites, int chapters, int chw, int ratings, int readers) {
         this.title = title;
         this.synopsis = synopsis;
@@ -84,7 +85,7 @@ public class Story {
      * Gets the total view count of the story.
      * @return the total view count of the story.
      */
-    public long getViews() {
+    public String getViews() {
         return views;
     }
 
