@@ -1,8 +1,11 @@
 [![](https://jitpack.io/v/ShindouMihou/amatsuki.svg)](https://jitpack.io/#ShindouMihou/amatsuki)
 # Amatsuki
 
-A simple scraper for ScribbleHub built in Java, for searching stories, users or collecting information of those two using either keywords, or URLs.
-Built in Java, meant for a Discord bot.
+Amatsuki is an asychronous simple text scraper for ScribbleHub built in Java, the main purpose for this library is to scrape public user data (bio, followed by x users, etc...) , or story data (synopsis, story title, thumbnail, etc...). The library is compatiable with any Java version above 1.8 (standard), and heavily uses on CompletableFutures and Optionals to achieve its results.
+
+The main use for this library is to search for stories, or users in the website ScribbleHub, and is mostly implemented on Discord Bots instead of actual heavy load programs. Please keep in mind that this library is still a mess, but it achieves what it can. 
+
+If you wish to improve the library, please feel free to do so.
 
 ## How to add.
 
@@ -56,17 +59,17 @@ If you also want to, you can improve everything to your liking as I will only be
 new Amatsuki().searchStory("A Dream Foretold");
 ```
 
-#### To search for a user (using keyword), returns Optional.
+#### To search for a user (using keyword), returns CompletableFuture<Optional>.
 ```java
 new Amatsuki().searchUser("Mihou");
 ```
 
-#### To collect information about a user using URL, returns an Optional as we don't know if the URL may be broken :'(.
+#### To collect information about a user using URL, returns an CompletableFuture<Optional> as we don't know if the URL may be broken :'(.
 ```java
 new Amatsuki().getUserFromUrl("https://www.scribblehub.com/profile/24680/mihou/");
 ```
 
-#### To collect information about a story using URL, returns Optional for the same reason :'(.
+#### To collect information about a story using URL, returns CompletableFuture<Optional> for the same reason :'(.
 ```java
 new Amatsuki().getStoryFromUrl("https://www.scribblehub.com/series/193852/a-dream-foretold/");
 ```
