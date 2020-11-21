@@ -54,7 +54,10 @@ As of now, the only way to get this is through Jitpack which is still a simple w
 Amatsuki has a single class that has everything needed, this class is called ``Amatsuki`` which is as expected.
 If you also want to, you can improve everything to your liking as I will only be using this for the basic tasks.
 
-#### To search for a story (using keyword), all the results here returns as an Optional.
+All of these results in an ``CompletableFuture<Optional>``, Optionals are used to protect against null whilst CompletableFuture
+is used for asynchronous tasks.
+
+#### To search for a story (using keyword).
 ```java
 new Amatsuki().searchStory("A Dream Foretold");
 ```
@@ -64,20 +67,23 @@ new Amatsuki().searchStory("A Dream Foretold");
 new Amatsuki().searchUser("Mihou");
 ```
 
-#### To collect information about a user using URL, returns an CompletableFuture<Optional> as we don't know if the URL may be broken :'(.
+#### To collect information about a user using URL.
 ```java
 new Amatsuki().getUserFromUrl("https://www.scribblehub.com/profile/24680/mihou/");
 ```
 
-#### To collect information about a story using URL, returns CompletableFuture<Optional> for the same reason :'(.
+#### To collect information about a story using URL.
 ```java
 new Amatsuki().getStoryFromUrl("https://www.scribblehub.com/series/193852/a-dream-foretold/");
 ```
 
-#### You can also specify a timeout if you wish, by default, the timeout is 30 seconds.
+#### You can also specify a timeout if you wish, by default, the timeout is 5 seconds.
 ```java
 new Amatsuki().searchUser("Mihou", 30000); // Timeout is in millis.
 ```
 
 #### Known issues
-Here are the currently known issues that will be fixed soon.
+Here are the currently known issues, if anyone knows the fix, feel free to send a PR.
+
+1. IOException: Underlying Input Stream Returned Zero Bytes.
+##### Occurrs in both 30 seconds and 5 second timeouts.
