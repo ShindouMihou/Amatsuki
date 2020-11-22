@@ -1,6 +1,8 @@
 package tk.mihou.amatsuki.api;
 
 import tk.mihou.amatsuki.api.connection.AmatsukiConnector;
+import tk.mihou.amatsuki.entities.frontpage.FrontpagePanel;
+import tk.mihou.amatsuki.entities.latest.LatestUpdatesResult;
 import tk.mihou.amatsuki.entities.story.Story;
 import tk.mihou.amatsuki.entities.story.lower.StoryResults;
 import tk.mihou.amatsuki.entities.user.User;
@@ -11,8 +13,18 @@ import java.util.concurrent.CompletableFuture;
 
 public class Amatsuki {
 
-    private AmatsukiConnector connector = new AmatsukiConnector();
-    private int defTimeout = 5000;
+    private final AmatsukiConnector connector = new AmatsukiConnector();
+    private final int defTimeout = 5000;
+
+    /**
+     * Sets the user agent for the library, please do not abuse.
+     * @param userAgent the user agent to use.
+     * @return Amatsuki.
+     */
+    public Amatsuki setUserAgent(String userAgent){
+        connector.setUserAgent(userAgent);
+        return this;
+    }
 
     /**
      * Searches and retrieves a list of users.
@@ -30,6 +42,58 @@ public class Amatsuki {
      */
     public CompletableFuture<Optional<List<StoryResults>>> searchStory(String query) {
         return connector.searchStory(query, defTimeout);
+    }
+
+    /**
+     * Retrieves the current latest updates on ScribbleHub frontpage.
+     * @return List of LatestUpdatesResults
+     */
+    public CompletableFuture<List<LatestUpdatesResult>> getLatestUpdates(){
+        return connector.getLatestUpdates(defTimeout);
+    }
+
+    /**
+     * Retrieves the current latest updates on ScribbleHub frontpage.
+     * @param timeout The time limit (millis).
+     * @return List of LatestUpdatesResults
+     */
+    public CompletableFuture<List<LatestUpdatesResult>> getLatestUpdates(int timeout){
+        return connector.getLatestUpdates(timeout);
+    }
+
+    /**
+     * Retrieves the current latest series on ScribbleHub frontpage.
+     * @return List<FrontpagePanel>
+     */
+    public CompletableFuture<List<FrontpagePanel>> getLatestSeries(){
+        return connector.getLatestSeries(defTimeout);
+    }
+
+    /**
+     * Retrieves the current latest series on ScribbleHub frontpage.
+     * @param timeout The time limit (millis).
+     * @return List<FrontpagePanel>
+     */
+    public CompletableFuture<List<FrontpagePanel>> getLatestSeries(int timeout){
+        return connector.getLatestSeries(timeout);
+    }
+
+    /**
+     * Retrieves the current trending on ScribbleHub frontpage.
+     * @return List<FrontpagePanel>
+     */
+    public CompletableFuture<List<FrontpagePanel>> getTrending(){
+        return connector.getLatestSeries(defTimeout);
+    }
+
+
+    /**
+     * Retrieves the current trending on ScribbleHub frontpage.
+     * @param timeout The time limit (millis).
+     * @return List<FrontpagePanel>
+     */
+    public CompletableFuture<List<FrontpagePanel>> getTrending(int timeout){
+        return connector.getTrending(timeout);
     }
 
     /**

@@ -4,6 +4,10 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
+import tk.mihou.amatsuki.entities.frontpage.FrontpagePanel;
+import tk.mihou.amatsuki.entities.frontpage.FrontpagePanelBuilder;
+import tk.mihou.amatsuki.entities.latest.LatestUpdatesBuilder;
+import tk.mihou.amatsuki.entities.latest.LatestUpdatesResult;
 import tk.mihou.amatsuki.entities.story.Story;
 import tk.mihou.amatsuki.entities.story.StoryBuilder;
 import tk.mihou.amatsuki.entities.story.lower.StoryResultBuilder;
@@ -12,7 +16,6 @@ import tk.mihou.amatsuki.entities.user.lower.UserResults;
 import tk.mihou.amatsuki.entities.user.lower.UserResultBuilder;
 import tk.mihou.amatsuki.entities.user.User;
 import tk.mihou.amatsuki.entities.user.UserBuilder;
-
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
@@ -23,11 +26,13 @@ import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class AmatsukiConnector {
 
-    private ExecutorService executorService = Executors.newSingleThreadExecutor();
-    private String userAgent = "Amatsuki-library/1.0.7 (Language=Java/1.8)";
+    private final ExecutorService executorService = Executors.newSingleThreadExecutor();
+    private String userAgent = "Amatsuki-library/1.1 (Language=Java/1.8)";
 
     /*
     - Amatsuki Connector, the base connector for all.
@@ -77,6 +82,100 @@ public class AmatsukiConnector {
             }
             return Optional.empty();
         });
+    }
+
+    public CompletableFuture<List<FrontpagePanel>> getTrending(int timeout){
+        return CompletableFuture.supplyAsync(() -> {
+            try {
+                Document doc = Jsoup.connect("https://www.scribblehub.com/")
+                        .userAgent(userAgent)
+                        .timeout(timeout).get();
+                List<FrontpagePanel> panels = new ArrayList<>();
+                doc.getElementsByClass("wi_fic_wrap slider")
+                        .next().first().getElementsByClass("new-novels-carousel_main")
+                        .first().getElementsByClass("new-novels-carousel_sub").first().getElementsByClass("novel_carousel_img")
+                        .forEach(element -> {
+                            FrontpagePanelBuilder builder = new FrontpagePanelBuilder();
+                            builder.setStoryURL(element.getElementsByTag("a").first().attr("href"));
+                            builder.setThumbnail(element.getElementsByTag("a").first().getElementsByTag("img").attr("src"));
+                            builder.setStoryName(element.getElementsByClass("centered_novel").attr("title"));
+                            panels.add(builder.build());
+                        });
+                return panels;
+            } catch (IOException e) {
+                Logger.getLogger("Amatsuki").log(Level.SEVERE, "Amatsuki: https://scribblehub.com returned: " + e.getMessage());
+            }
+            return null;
+        }, executorService);
+    }
+
+    public CompletableFuture<List<FrontpagePanel>> getLatestSeries(int timeout){
+        return CompletableFuture.supplyAsync(() -> {
+            try {
+                Document doc = Jsoup.connect("https://www.scribblehub.com/")
+                        .userAgent(userAgent)
+                        .timeout(timeout).get();
+                List<FrontpagePanel> panels = new ArrayList<>();
+                doc.getElementsByClass("wi_fic_wrap slider")
+                        .last().getElementsByClass("new-novels-carousel_main")
+                        .first().getElementsByClass("new-novels-carousel_sub").first().getElementsByClass("novel_carousel_img")
+                        .forEach(element -> {
+                            FrontpagePanelBuilder builder = new FrontpagePanelBuilder();
+                            builder.setStoryURL(element.getElementsByTag("a").first().attr("href"));
+                            builder.setThumbnail(element.getElementsByTag("a").first().getElementsByTag("img").attr("src"));
+                            builder.setStoryName(element.getElementsByClass("centered_novel").attr("title"));
+                            panels.add(builder.build());
+                        });
+                return panels;
+            } catch (IOException e) {
+                Logger.getLogger("Amatsuki").log(Level.SEVERE, "Amatsuki: https://scribblehub.com returned: " + e.getMessage());
+            }
+            return null;
+        }, executorService);
+    }
+
+    /**
+     * Returns the 10 results from latest updates, does not use Optional as this is guranteed to have a value.
+     * @param timeout The timeout before the connection closes (in millis).
+     * @return List<LatestUpdateResults>
+     */
+    public CompletableFuture<List<LatestUpdatesResult>> getLatestUpdates(int timeout){
+        return CompletableFuture.supplyAsync(() -> {
+            List<LatestUpdatesResult> results = new ArrayList<>();
+            try {
+                Document doc = Jsoup.connect("https://www.scribblehub.com/")
+                        .userAgent(userAgent)
+                        .timeout(timeout).get();
+                doc.getElementsByClass("wi-editfic_l-content_main").first().getElementsByClass("latest_releases_main")
+                .first().getElementsByClass("mr_fictable").first().getElementsByTag("tbody").first().getElementsByTag("tr").forEach(element -> {
+                    Element td = element.getElementsByTag("td").first();
+                    LatestUpdatesBuilder builder = new LatestUpdatesBuilder();
+                    // Sets the thumbnail.
+                    builder.setThumbnail(td.getElementsByClass("m_img_fic").first().getElementsByTag("img").first().attr("src"));
+                    Element body = element.getElementsByClass("search_body ficmain").first();
+                    // Sets the story details.
+                    builder.setStoryURL(body.getElementsByTag("span").first().getElementsByClass("fp_title main").first().attr("href"));
+                    builder.setStoryName(body.getElementsByTag("span").first().getElementsByClass("fp_title main").first().attr("title"));
+                    // Sets the genres.
+                    List<String> genres = new ArrayList<>();
+                    body.getElementsByTag("div").first().getElementsByClass("fic_genre search ahmain").forEach(element1 -> genres.add(element1.ownText()));
+                    builder.setGenres(genres);
+                    // Set the chapter details.
+                    builder.setChapterURL(body.getElementsByTag("div").next().first().getElementsByTag("a").attr("href"));
+                    builder.setChapterTitle(body.getElementsByTag("div").next().first().getElementsByTag("a").first().ownText());
+                    // Sets the author details.
+                    builder.setAuthorName(body.getElementsByTag("div").last().getElementsByClass("fp_authorname").first().ownText());
+                    builder.setAuthorURL(body.getElementsByTag("div").last().getElementsByTag("a").attr("href"));
+                    // Last update.
+                    builder.setLastUpdate(body.getElementsByTag("div").last().ownText().replaceFirst(", ", ""));
+                    results.add(builder.build());
+                });
+                return results;
+            } catch (IOException e) {
+                Logger.getLogger("Amatsuki").log(Level.SEVERE, "Amatsuki: https://scribblehub.com returned: " + e.getMessage());
+            }
+            return null;
+        }, executorService);
     }
 
     public CompletableFuture<Optional<List<StoryResults>>> searchStory(String query, int timeout){
