@@ -1,7 +1,7 @@
 package tk.mihou.amatsuki.api;
 
 import tk.mihou.amatsuki.api.connection.AmatsukiConnector;
-import tk.mihou.amatsuki.entities.frontpage.FrontpagePanel;
+import tk.mihou.amatsuki.api.enums.Rankings;
 import tk.mihou.amatsuki.entities.latest.LatestUpdatesResult;
 import tk.mihou.amatsuki.entities.story.Story;
 import tk.mihou.amatsuki.entities.story.lower.StoryResults;
@@ -63,37 +63,55 @@ public class Amatsuki {
 
     /**
      * Retrieves the current latest series on ScribbleHub frontpage.
-     * @return List<FrontpagePanel>
+     * @return List<StoryResults>
      */
-    public CompletableFuture<List<FrontpagePanel>> getLatestSeries(){
+    public CompletableFuture<List<StoryResults>> getLatestSeries(){
         return connector.getLatestSeries(defTimeout);
     }
 
     /**
      * Retrieves the current latest series on ScribbleHub frontpage.
      * @param timeout The time limit (millis).
-     * @return List<FrontpagePanel>
+     * @return List<StoryResults>
      */
-    public CompletableFuture<List<FrontpagePanel>> getLatestSeries(int timeout){
+    public CompletableFuture<List<StoryResults>> getLatestSeries(int timeout){
         return connector.getLatestSeries(timeout);
     }
 
     /**
-     * Retrieves the current trending on ScribbleHub frontpage.
-     * @return List<FrontpagePanel>
+     * Retrieves the current trending on ScribbleHub.
+     * @return List<StoryResults>
      */
-    public CompletableFuture<List<FrontpagePanel>> getTrending(){
-        return connector.getTrending(defTimeout);
+    public CompletableFuture<List<StoryResults>> getTrending(){
+        return connector.getRanking(Rankings.RISING, defTimeout);
     }
 
 
     /**
-     * Retrieves the current trending on ScribbleHub frontpage.
+     * Retrieves the current trending on ScribbleHub.
      * @param timeout The time limit (millis).
-     * @return List<FrontpagePanel>
+     * @return List<StoryResults>
      */
-    public CompletableFuture<List<FrontpagePanel>> getTrending(int timeout){
-        return connector.getTrending(timeout);
+    public CompletableFuture<List<StoryResults>> getTrending(int timeout){
+        return connector.getRanking(Rankings.RISING, timeout);
+    }
+
+    /**
+     * Retrieves a certain specified ranking from ScribbleHub.
+     * @return List<StoryResults>
+     */
+    public CompletableFuture<List<StoryResults>> getCertainRankings(Rankings ranking){
+        return connector.getRanking(ranking, defTimeout);
+    }
+
+
+    /**
+     * Retrieves a certain specified ranking from ScribbleHub.
+     * @param timeout The time limit (millis).
+     * @return List<StoryResults>
+     */
+    public CompletableFuture<List<StoryResults>> getCertainRankings(Rankings ranking, int timeout){
+        return connector.getRanking(ranking, timeout);
     }
 
     /**

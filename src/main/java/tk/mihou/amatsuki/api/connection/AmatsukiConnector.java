@@ -4,8 +4,7 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
-import tk.mihou.amatsuki.entities.frontpage.FrontpagePanel;
-import tk.mihou.amatsuki.entities.frontpage.FrontpagePanelBuilder;
+import tk.mihou.amatsuki.api.enums.Rankings;
 import tk.mihou.amatsuki.entities.latest.LatestUpdatesBuilder;
 import tk.mihou.amatsuki.entities.latest.LatestUpdatesResult;
 import tk.mihou.amatsuki.entities.story.Story;
@@ -16,7 +15,6 @@ import tk.mihou.amatsuki.entities.user.lower.UserResults;
 import tk.mihou.amatsuki.entities.user.lower.UserResultBuilder;
 import tk.mihou.amatsuki.entities.user.User;
 import tk.mihou.amatsuki.entities.user.UserBuilder;
-
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
@@ -33,7 +31,7 @@ import java.util.logging.Logger;
 public class AmatsukiConnector {
 
     private final ExecutorService executorService = Executors.newSingleThreadExecutor();
-    private String userAgent = "Amatsuki-library/1.1.5 (Language=Java/1.8)";
+    private String userAgent = "Amatsuki-library/1.2 (Language=Java/1.8)";
 
     /*
     - Amatsuki Connector, the base connector for all.
@@ -85,23 +83,53 @@ public class AmatsukiConnector {
         });
     }
 
-    public CompletableFuture<List<FrontpagePanel>> getTrending(int timeout){
+    public CompletableFuture<List<StoryResults>> getRanking(Rankings ranking, int timeout){
         return CompletableFuture.supplyAsync(() -> {
             try {
-                Document doc = Jsoup.connect("https://www.scribblehub.com/")
+                Document doc = Jsoup.connect(String.format("https://www.scribblehub.com/series-ranking/?sort=%d&order=1", ranking.getLocation()))
                         .userAgent(userAgent)
                         .timeout(timeout).get();
-                List<FrontpagePanel> panels = new ArrayList<>();
-                doc.getElementsByClass("wi_fic_wrap slider")
-                        .next().first().getElementsByClass("new-novels-carousel_main")
-                        .first().getElementsByClass("new-novels-carousel_sub").first().getElementsByClass("novel_carousel_img")
-                        .forEach(element -> {
-                            FrontpagePanelBuilder builder = new FrontpagePanelBuilder();
-                            builder.setStoryURL(element.getElementsByTag("a").first().attr("href"));
-                            builder.setThumbnail(element.getElementsByTag("a").first().getElementsByTag("img").attr("src"));
-                            builder.setStoryName(element.getElementsByClass("centered_novel").attr("title"));
-                            panels.add(builder.build());
-                        });
+                List<StoryResults> panels = new ArrayList<>();
+                doc.getElementsByClass("search_main_box").forEach(element -> {
+                    StoryResultBuilder builder = new StoryResultBuilder();
+
+                    // Gets the thumbnail and rating.
+                    builder.setThumbnail(element.getElementsByClass("search_img").select("img").attr("src"));
+                    builder.setRating(Double.parseDouble(element.getElementsByClass("search_img").first().getElementsByClass("search_ratings").first().ownText().replaceAll("[^\\d.]", "")));
+
+                    // Get the extra details.
+                    Element body = element.getElementsByClass("search_body").first();
+                    builder.setName(body.getElementsByClass("search_title").select("a").first().text());
+                    builder.setUrl(body.getElementsByClass("search_title").select("a").attr("href"));
+
+                    // Retrieve both synopsis.
+                    StringBuilder str = new StringBuilder();
+                    builder.setShortSynopsis(body.ownText());
+                    str.append(body.ownText());
+                    body.select("span.testhide").eachText().forEach(s -> str.append("\n").append(s));
+                    builder.setFullSynopsis(str.toString().replaceAll("<<less", ""));
+
+                    // Retrieve all the genres.
+                    List<String> genres = new ArrayList<>();
+                    body.getElementsByClass("search_genre").first().getElementsByTag("a").forEach(element1 -> genres.add(element1.ownText()));
+                    builder.setGenres(genres);
+
+                    // Retrieve all statistics.
+                    Element stats = body.getElementsByClass("search_stats").first();
+                    builder.setViews(stats.getElementsByTag("span").first().ownText().replaceAll("[^\\d.km]", ""));
+                    builder.setFavorites(Long.parseLong(stats.getElementsByTag("span").first().nextElementSibling().ownText().replaceAll("[^\\d]", "")));
+                    builder.setChapters(Integer.parseInt(stats.getElementsByTag("span").first().nextElementSibling().nextElementSibling().ownText().replaceAll("[^\\d]", "")));
+                    builder.setChw(Integer.parseInt(stats.getElementsByTag("span").first().nextElementSibling().nextElementSibling().nextElementSibling().ownText().replaceAll("[^\\d]", "")));
+                    builder.setReaders(Integer.parseInt(stats.getElementsByTag("span").first().nextElementSibling().nextElementSibling().nextElementSibling().nextElementSibling().ownText().replaceAll("[^\\d]", "")));
+                    builder.setReviews(Integer.parseInt(stats.getElementsByTag("span").first().nextElementSibling().nextElementSibling().nextElementSibling().nextElementSibling()
+                            .nextElementSibling().ownText().replaceAll("[^\\d]", "")));
+                    builder.setWord(stats.getElementsByTag("span").first().nextElementSibling().nextElementSibling().nextElementSibling().nextElementSibling()
+                            .nextElementSibling().nextElementSibling().ownText().replaceAll("[^\\d.km]", ""));
+                    builder.setLastUpdated(stats.getElementsByTag("span").first().nextElementSibling().nextElementSibling().nextElementSibling().nextElementSibling()
+                            .nextElementSibling().nextElementSibling().nextElementSibling().ownText());
+                    builder.setCreator(stats.getElementsByTag("span").last().ownText());
+                    panels.add(builder.build());
+                });
                 return panels;
             } catch (IOException e) {
                 Logger.getLogger("Amatsuki").log(Level.SEVERE, "Amatsuki: https://scribblehub.com returned: " + e.getMessage());
@@ -110,23 +138,53 @@ public class AmatsukiConnector {
         }, executorService);
     }
 
-    public CompletableFuture<List<FrontpagePanel>> getLatestSeries(int timeout){
+    public CompletableFuture<List<StoryResults>> getLatestSeries(int timeout){
         return CompletableFuture.supplyAsync(() -> {
             try {
                 Document doc = Jsoup.connect("https://www.scribblehub.com/")
                         .userAgent(userAgent)
                         .timeout(timeout).get();
-                List<FrontpagePanel> panels = new ArrayList<>();
-                doc.getElementsByClass("wi_fic_wrap slider")
-                        .last().getElementsByClass("new-novels-carousel_main")
-                        .first().getElementsByClass("new-novels-carousel_sub").first().getElementsByClass("novel_carousel_img")
-                        .forEach(element -> {
-                            FrontpagePanelBuilder builder = new FrontpagePanelBuilder();
-                            builder.setStoryURL(element.getElementsByTag("a").first().attr("href"));
-                            builder.setThumbnail(element.getElementsByTag("a").first().getElementsByTag("img").attr("src"));
-                            builder.setStoryName(element.getElementsByClass("centered_novel").attr("title"));
-                            panels.add(builder.build());
-                        });
+                List<StoryResults> panels = new ArrayList<>();
+                doc.getElementsByClass("search_main_box").forEach(element -> {
+                    StoryResultBuilder builder = new StoryResultBuilder();
+
+                    // Gets the thumbnail and rating.
+                    builder.setThumbnail(element.getElementsByClass("search_img").select("img").attr("src"));
+                    builder.setRating(Double.parseDouble(element.getElementsByClass("search_img").first().getElementsByClass("search_ratings").first().ownText().replaceAll("[^\\d.]", "")));
+
+                    // Get the extra details.
+                    Element body = element.getElementsByClass("search_body").first();
+                    builder.setName(body.getElementsByClass("search_title").select("a").first().text());
+                    builder.setUrl(body.getElementsByClass("search_title").select("a").attr("href"));
+
+                    // Retrieve both synopsis.
+                    StringBuilder str = new StringBuilder();
+                    builder.setShortSynopsis(body.ownText());
+                    str.append(body.ownText());
+                    body.select("span.testhide").eachText().forEach(s -> str.append("\n").append(s));
+                    builder.setFullSynopsis(str.toString().replaceAll("<<less", ""));
+
+                    // Retrieve all the genres.
+                    List<String> genres = new ArrayList<>();
+                    body.getElementsByClass("search_genre").first().getElementsByTag("a").forEach(element1 -> genres.add(element1.ownText()));
+                    builder.setGenres(genres);
+
+                    // Retrieve all statistics.
+                    Element stats = body.getElementsByClass("search_stats").first();
+                    builder.setViews(stats.getElementsByTag("span").first().ownText().replaceAll("[^\\d.km]", ""));
+                    builder.setFavorites(Long.parseLong(stats.getElementsByTag("span").first().nextElementSibling().ownText().replaceAll("[^\\d]", "")));
+                    builder.setChapters(Integer.parseInt(stats.getElementsByTag("span").first().nextElementSibling().nextElementSibling().ownText().replaceAll("[^\\d]", "")));
+                    builder.setChw(Integer.parseInt(stats.getElementsByTag("span").first().nextElementSibling().nextElementSibling().nextElementSibling().ownText().replaceAll("[^\\d]", "")));
+                    builder.setReaders(Integer.parseInt(stats.getElementsByTag("span").first().nextElementSibling().nextElementSibling().nextElementSibling().nextElementSibling().ownText().replaceAll("[^\\d]", "")));
+                    builder.setReviews(Integer.parseInt(stats.getElementsByTag("span").first().nextElementSibling().nextElementSibling().nextElementSibling().nextElementSibling()
+                            .nextElementSibling().ownText().replaceAll("[^\\d]", "")));
+                    builder.setWord(stats.getElementsByTag("span").first().nextElementSibling().nextElementSibling().nextElementSibling().nextElementSibling()
+                            .nextElementSibling().nextElementSibling().ownText().replaceAll("[^\\d.km]", ""));
+                    builder.setLastUpdated(stats.getElementsByTag("span").first().nextElementSibling().nextElementSibling().nextElementSibling().nextElementSibling()
+                            .nextElementSibling().nextElementSibling().nextElementSibling().ownText());
+                    builder.setCreator(stats.getElementsByTag("span").last().ownText());
+                    panels.add(builder.build());
+                });
                 return panels;
             } catch (IOException e) {
                 Logger.getLogger("Amatsuki").log(Level.SEVERE, "Amatsuki: https://scribblehub.com returned: " + e.getMessage());
@@ -183,22 +241,50 @@ public class AmatsukiConnector {
         return CompletableFuture.supplyAsync(() -> {
             try {
                 List<StoryResults> stories = new ArrayList<>();
-                ArrayList<String> thumbnails = new ArrayList<>();
                 Document doc = Jsoup.connect(String.format("https://www.scribblehub.com/?s=%s&post_type=fictionposts", encodeValue(query)))
                         .referrer("https://scribblehub.com")
                         .userAgent(userAgent)
                         .timeout(timeout).get();
-                doc.getElementsByClass("search_main_box").forEach(element -> element.getElementsByClass("search_img").forEach(searchImg -> thumbnails.add(searchImg.getElementsByTag("img").attr("src"))));
-                IntegerBuilder i = new IntegerBuilder(0);
-                doc.getElementsByClass("search_body").forEach(elemental -> elemental.getElementsByClass("search_title").forEach(searchTitle -> {
+                doc.getElementsByClass("search_main_box").forEach(element -> {
                     StoryResultBuilder builder = new StoryResultBuilder();
-                    builder.setName(searchTitle.getElementsByTag("a").first().ownText());
-                    builder.setUrl(searchTitle.getElementsByTag("a").attr("href"));
-                    builder.setSynopsis(elemental.ownText() + "..");
-                    builder.setThumbnail(thumbnails.get(i.get()));
+
+                    // Gets the thumbnail and rating.
+                    builder.setThumbnail(element.getElementsByClass("search_img").select("img").attr("src"));
+                    builder.setRating(Double.parseDouble(element.getElementsByClass("search_img").first().getElementsByClass("search_ratings").first().ownText().replaceAll("[^\\d.]", "")));
+
+                    // Get the extra details.
+                    Element body = element.getElementsByClass("search_body").first();
+                    builder.setName(body.getElementsByClass("search_title").select("a").first().text());
+                    builder.setUrl(body.getElementsByClass("search_title").select("a").attr("href"));
+
+                    // Retrieve both synopsis.
+                    StringBuilder str = new StringBuilder();
+                    builder.setShortSynopsis(body.ownText());
+                    str.append(body.ownText());
+                    body.select("span.testhide").eachText().forEach(s -> str.append("\n").append(s));
+                    builder.setFullSynopsis(str.toString().replaceAll("<<less", ""));
+
+                    // Retrieve all the genres.
+                    List<String> genres = new ArrayList<>();
+                    body.getElementsByClass("search_genre").first().getElementsByTag("a").forEach(element1 -> genres.add(element1.ownText()));
+                    builder.setGenres(genres);
+
+                    // Retrieve all statistics.
+                    Element stats = body.getElementsByClass("search_stats").first();
+                    builder.setViews(stats.getElementsByTag("span").first().ownText().replaceAll("[^\\d.km]", ""));
+                    builder.setFavorites(Long.parseLong(stats.getElementsByTag("span").first().nextElementSibling().ownText().replaceAll("[^\\d]", "")));
+                    builder.setChapters(Integer.parseInt(stats.getElementsByTag("span").first().nextElementSibling().nextElementSibling().ownText().replaceAll("[^\\d]", "")));
+                    builder.setChw(Integer.parseInt(stats.getElementsByTag("span").first().nextElementSibling().nextElementSibling().nextElementSibling().ownText().replaceAll("[^\\d]", "")));
+                    builder.setReaders(Integer.parseInt(stats.getElementsByTag("span").first().nextElementSibling().nextElementSibling().nextElementSibling().nextElementSibling().ownText().replaceAll("[^\\d]", "")));
+                    builder.setReviews(Integer.parseInt(stats.getElementsByTag("span").first().nextElementSibling().nextElementSibling().nextElementSibling().nextElementSibling()
+                            .nextElementSibling().ownText().replaceAll("[^\\d]", "")));
+                    builder.setWord(stats.getElementsByTag("span").first().nextElementSibling().nextElementSibling().nextElementSibling().nextElementSibling()
+                            .nextElementSibling().nextElementSibling().ownText().replaceAll("[^\\d.km]", ""));
+                    builder.setLastUpdated(stats.getElementsByTag("span").first().nextElementSibling().nextElementSibling().nextElementSibling().nextElementSibling()
+                            .nextElementSibling().nextElementSibling().nextElementSibling().ownText());
+                    builder.setCreator(stats.getElementsByTag("span").last().ownText());
                     stories.add(builder.build());
-                    i.add(1);
-                }));
+                });
                 return stories.isEmpty() ? Optional.empty() : Optional.of(stories);
             } catch (IOException ignore) {
             }
@@ -323,26 +409,4 @@ public class AmatsukiConnector {
             throw new RuntimeException(ex.getCause());
         }
     }
-
-    static class IntegerBuilder {
-
-        /*
-        I wonder what this is... don't ask.
-         */
-
-        private int i;
-        public IntegerBuilder(int i){
-            this.i = i;
-        }
-
-        public IntegerBuilder add(int x){
-            i = i + x;
-            return this;
-        }
-
-        public int get(){
-            return i;
-        }
-    }
-
 }
