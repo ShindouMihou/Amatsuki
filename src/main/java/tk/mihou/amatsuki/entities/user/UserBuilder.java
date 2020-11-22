@@ -12,9 +12,34 @@ public class UserBuilder {
     private String bio = "No context.";
     private String url;
     private String avatar;
+    private String birthday;
+    private String gender;
+    private String location;
+    private String homepage;
+    private String lastActive;
 
     public void setAvatar(String avatar) {
         this.avatar = avatar;
+    }
+
+    public void setBirthday(String birthday) {
+        this.birthday = birthday;
+    }
+
+    public void setGender(String gender) {
+        this.gender = gender;
+    }
+
+    public void setLocation(String location) {
+        this.location = location;
+    }
+
+    public void setHomepage(String homepage) {
+        this.homepage = homepage;
+    }
+
+    public void setLastActive(String lastActive) {
+        this.lastActive = lastActive;
     }
 
     public void setTotalWords(long totalWords) {
@@ -54,7 +79,8 @@ public class UserBuilder {
     }
 
     public User build(){
-        return new User(totalWords, totalSeries, totalViews, totalReviews, totalReaders, totalFollowers, name, bio, url, avatar);
+        return new User(totalWords, totalSeries, totalViews, totalReviews, totalReaders, totalFollowers, name, bio, url, avatar,
+                birthday, gender, location, homepage, lastActive);
     }
 
 }

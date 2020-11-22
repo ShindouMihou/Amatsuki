@@ -1,5 +1,6 @@
 package tk.mihou.amatsuki.entities.story;
 
+import java.util.List;
 import java.util.Objects;
 
 public class Story {
@@ -16,9 +17,11 @@ public class Story {
     private final int chw;
     private final int readers;
     private final int ratings;
+    private final List<String> genres;
+    private final List<String> tags;
 
     public Story(String title, String synopsis, String url, String image, String creator, Double rating, String views,
-                 long favorites, int chapters, int chw, int ratings, int readers) {
+                 long favorites, int chapters, int chw, int ratings, int readers, List<String> genres, List<String> tags) {
         this.title = title;
         this.synopsis = synopsis;
         this.url = url;
@@ -30,6 +33,8 @@ public class Story {
         this.chapters = chapters;
         this.chw = chw;
         this.readers = readers;
+        this.genres = genres;
+        this.tags = tags;
         this.ratings = ratings;
     }
 
@@ -39,6 +44,22 @@ public class Story {
      */
     public String getTitle() {
         return title;
+    }
+
+    /**
+     * Gets the tags of the story.
+     * @return the tags of the story.
+     */
+    public List<String> getTags(){
+        return tags;
+    }
+
+    /**
+     * Gets the genres of the story.
+     * @return genres of the story.
+     */
+    public List<String> getGenres(){
+        return genres;
     }
 
     /**

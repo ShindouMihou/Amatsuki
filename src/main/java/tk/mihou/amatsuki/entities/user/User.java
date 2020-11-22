@@ -14,19 +14,68 @@ public class User {
     private String name;
     private String bio;
     private String avatar;
+    private String birthday;
+    private String gender;
+    private String location;
+    private String homepage;
+    private String lastActive;
 
-    public User(long totalWords, int totalSeries, long totalViews, int totalReviews, int totalReaders, int totalFollowers, String name, String bio, String url,
-                String avatar) {
+    public User(long totalWords, int totalSeries, long totalViews, int totalReviews, int totalReaders, int totalFollowers, String url, String name, String bio, String avatar, String birthday, String gender, String location, String homepage, String lastActive) {
         this.totalWords = totalWords;
         this.totalSeries = totalSeries;
         this.totalViews = totalViews;
         this.totalReviews = totalReviews;
         this.totalReaders = totalReaders;
         this.totalFollowers = totalFollowers;
+        this.url = url;
         this.name = name;
         this.bio = bio;
-        this.url = url;
         this.avatar = avatar;
+        this.birthday = birthday;
+        this.gender = gender;
+        this.location = location;
+        this.homepage = homepage;
+        this.lastActive = lastActive;
+    }
+
+    /**
+     * Gets the user's birthday if specified.
+     * @return the birthday.
+     */
+    public String getBirthday() {
+        return birthday;
+    }
+
+    /**
+     * Gets the user's gender if specified.
+     * @return gender.
+     */
+    public String getGender() {
+        return gender;
+    }
+
+    /**
+     * Gets the user's location if specified.
+     * @return location.
+     */
+    public String getLocation() {
+        return location;
+    }
+
+    /**
+     * Gets the user's homepage if specified.
+     * @return homepage.
+     */
+    public String getHomepage() {
+        return homepage;
+    }
+
+    /**
+     * Retrieves when the user was last active.
+     * @return last active.
+     */
+    public String getLastActive() {
+        return lastActive;
     }
 
     /**

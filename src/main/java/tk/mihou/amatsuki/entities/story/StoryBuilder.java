@@ -1,12 +1,15 @@
 package tk.mihou.amatsuki.entities.story;
 
+import java.util.List;
+
 public class StoryBuilder {
 
     private String title, synopsis, url, image, creator, views;
     private Double rating;
     private long favorites;
     private int chapters, chapterPerWeek, ratings, readers;
-
+    private List<String> genres;
+    private List<String> tags;
     public void setTitle(String title) {
         this.title = title;
     }
@@ -55,8 +58,16 @@ public class StoryBuilder {
         this.readers = readers;
     }
 
+    public void setGenres(List<String> genres) {
+        this.genres = genres;
+    }
+
+    public void setTags(List<String> tags) {
+        this.tags = tags;
+    }
+
     public Story build(){
-        return new Story(title, synopsis, url, image, creator, rating, views, favorites, chapters, chapterPerWeek, ratings, readers);
+        return new Story(title, synopsis, url, image, creator, rating, views, favorites, chapters, chapterPerWeek, ratings, readers, genres, tags);
     }
 
 }

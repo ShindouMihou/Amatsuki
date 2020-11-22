@@ -16,6 +16,7 @@ import tk.mihou.amatsuki.entities.user.lower.UserResults;
 import tk.mihou.amatsuki.entities.user.lower.UserResultBuilder;
 import tk.mihou.amatsuki.entities.user.User;
 import tk.mihou.amatsuki.entities.user.UserBuilder;
+
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
@@ -32,7 +33,7 @@ import java.util.logging.Logger;
 public class AmatsukiConnector {
 
     private final ExecutorService executorService = Executors.newSingleThreadExecutor();
-    private String userAgent = "Amatsuki-library/1.1 (Language=Java/1.8)";
+    private String userAgent = "Amatsuki-library/1.1.5 (Language=Java/1.8)";
 
     /*
     - Amatsuki Connector, the base connector for all.
@@ -209,57 +210,53 @@ public class AmatsukiConnector {
         return CompletableFuture.supplyAsync(() -> {
             try {
                 StoryBuilder entity = new StoryBuilder();
+                // Connects to the URL.
                 Document doc = Jsoup.connect(url)
                         .referrer("https://scribblehub.com")
                         .userAgent(userAgent)
                         .timeout(timeout).get();
-                Elements metaTags = doc.getElementsByTag("meta");
-                Elements link = doc.getElementsByTag("link");
+
+                // Retrieve the synopsis.
+                Element details = doc.getElementsByClass("wi_fic_wrap bottom").first().getElementsByClass("wi-fic_l-content fic")
+                        .first().getElementsByClass("box_fictionpage details").first().getElementsByClass("fic_row details").first();
+                StringBuilder perfectDescription = new StringBuilder();
+                details.getElementsByClass("wi_fic_desc").first().getElementsByTag("p").forEach(element -> perfectDescription.append(element.ownText()).append("\n"));
+                entity.setSynopsis(perfectDescription.toString());
+
+                // Retrieving the genres.
+                List<String> genres = new ArrayList<>();
+                details.getElementsByClass("wi_fic_genre").first().getElementsByTag("span").forEach(element -> genres.add(element.getElementsByClass("fic_genre").first().ownText()));
+
+                // Retrieving the tags.
+                List<String> tags = new ArrayList<>();
+                details.getElementsByClass("wi_fic_showtags").first().getElementsByTag("span").forEach(element -> element.getElementsByTag("a").forEach(element1 -> tags.add(element1.ownText())));
+
+                // Deploying all the data onto the entity.
+                entity.setGenres(genres);
+                entity.setTags(tags);
+
                 Elements views = doc.getElementsByClass("fic_stats");
-                Elements rating = doc.getElementsByClass("fic_rate");
-                rating.forEach(element -> {
-                    List<String> ratings = element.select("span").first().getElementById("ratefic_user").select("span").eachText();
-                    entity.setRatings(Integer.parseInt(ratings.get(4).replaceAll("\\(", "").replaceAll("\\)", "").replaceAll(" ratings", "")));
-                    entity.setRating(Double.parseDouble(ratings.get(2)));
-                });
-                views.forEach(element -> views.select("span.st_item").before("span.mb_stat").eachText().forEach(s -> {
-                    if (s.endsWith("Views"))
-                        entity.setViews(s.replaceAll(" Views", ""));
-                    if (s.endsWith("Favorites"))
-                        entity.setFavorites(s.replaceAll(" Favorites", ""));
-                    if (s.endsWith("Chapters"))
-                        entity.setChapters(Integer.parseInt(s.replaceAll(" Chapters", "")));
-                    if (s.endsWith("Chapters/Week"))
-                        entity.setChapterPerWeek(Integer.parseInt(s.replaceAll(" Chapters/Week", "")));
-                    if (s.endsWith("Readers"))
-                        entity.setReaders(Integer.parseInt(s.replaceAll(" Readers", "")));
-                }));
-                metaTags.forEach((metaTag) -> {
-                    String content = metaTag.attr("content");
-                    String name = metaTag.attr("property");
-                    switch (name) {
-                        case "og:description":
-                            entity.setSynopsis(Jsoup.parse(content).text());
-                            break;
-                        case "og:title":
-                            entity.setTitle(Jsoup.parse(content).text());
-                            break;
-                        case "og:image":
-                            entity.setImage(content);
-                            break;
-                    }
-                    String twitter = metaTag.attr("name");
-                    if ("twitter:creator".equals(twitter)) {
-                        entity.setCreator(content);
-                    }
-                });
-                link.forEach((metaTag) -> {
-                    String content = metaTag.attr("href");
-                    String name = metaTag.attr("rel");
-                    if ("canonical".equals(name)) {
-                        entity.setUrl(content);
-                    }
-                });
+
+                // Transformed all of these to a one-liner, collects the rating statistics.
+                entity.setRating(Double.parseDouble(doc.getElementsByClass("fic_rate").select("span").first().getElementsByTag("span").first().text().split(" ")[0]));
+                entity.setRatings(Integer.parseInt(doc.getElementsByClass("fic_rate").select("span").first().getElementsByTag("span").first().text().split(" ")[1].replaceAll("[^\\d.]", "")));
+
+                // Transformed all these to a one to two-liner, this part collects all the statistics.
+                entity.setViews(views.select("span.st_item").before("span.mb_stat").first().text().replaceAll("[^\\d.km]", ""));
+                entity.setFavorites(views.select("span.st_item").before("span.mb_stat").first().nextElementSibling().text().replaceAll("[^\\d]", ""));
+                entity.setChapters(Integer.parseInt(views.select("span.st_item").before("span.mb_stat").first().nextElementSibling().nextElementSibling().text().replaceAll("[^\\d]", "")));
+                entity.setChapterPerWeek(Integer.parseInt(views.select("span.st_item").before("span.mb_stat").first().nextElementSibling().nextElementSibling()
+                        .nextElementSibling().text().replaceAll("[^\\d]", "")));
+                entity.setReaders(Integer.parseInt(views.select("span.st_item").before("span.mb_stat").last().text().replaceAll("[^\\d]", "")));
+
+                // Retrieving basic information from meta tags.
+                entity.setTitle(doc.select("meta[name='twitter:title']").attr("content"));
+                entity.setImage(doc.select("meta[name='twitter:image']").attr("content"));
+                entity.setCreator(doc.select("meta[name='twitter:creator']").attr("content"));
+
+                // I wonder why I was getting the URL when there is already a URL provided?
+                entity.setUrl(url);
+
                 return Optional.of(entity.build());
             } catch (IOException ignore) {
             }
@@ -275,43 +272,42 @@ public class AmatsukiConnector {
                         .referrer("https://scribblehub.com")
                         .userAgent(userAgent)
                         .timeout(timeout).get();
-                builder.setBio(doc.getElementsByClass("user_bio_profile").text());
-                doc.getElementsByClass("site-content-contain profile").forEach(element -> element.getElementsByTag("meta").forEach(meta -> {
-                    switch (meta.attr("property")) {
-                        case "og:image":
-                            builder.setAvatar(meta.attr("content"));
-                            break;
-                        case "og:description":
-                            builder.setName(meta.attr("content").replaceFirst("'s profile.", ""));
-                            break;
-                    }
-                }));
-                doc.getElementsByClass("table_pro_overview").forEach(table -> table.select("tr").forEach(row -> {
-                    Elements th = row.select("th");
-                    Elements td = row.select("td");
-                    for (int i = 0; i < th.size(); i++) {
-                        switch (th.get(i).ownText()) {
-                            case "Series:":
-                                builder.setTotalSeries(Integer.parseInt(td.get(i).ownText().replaceAll(",", "")));
-                                break;
-                            case "Total Words:":
-                                builder.setTotalWords(Long.parseLong(td.get(i).ownText().replaceAll(",", "")));
-                                break;
-                            case "Reviews Received:":
-                                builder.setTotalReviews(Integer.parseInt(td.get(i).ownText().replaceAll(",", "")));
-                                break;
-                            case "Readers:":
-                                builder.setTotalReaders(Integer.parseInt(td.get(i).ownText().replaceAll(",", "")));
-                                break;
-                            case "Followers:":
-                                builder.setTotalFollowers(Integer.parseInt(td.get(i).ownText().replaceAll(",", "")));
-                                break;
-                            case "Total Pageviews:":
-                                builder.setTotalViews(Long.parseLong(td.get(i).ownText().replaceAll(",", "")));
-                                break;
-                        }
-                    }
-                }));
+                // Collects the perfect bio, since whitespace is killed by Jsoup, we simply add '\n' after every <p>.
+                StringBuilder bio = new StringBuilder();
+                doc.getElementsByClass("user_bio_profile").first().getElementsByTag("p").forEach(element ->
+                        bio.append(element.text()).append("\n"));
+                builder.setBio(bio.toString());
+
+                // Transformed into a one-liner, collects the meta tags information.
+                Element metad = doc.getElementsByClass("site-content-contain profile").first();
+                builder.setAvatar(metad.select("meta[property='og:image']").attr("content"));
+                builder.setName(metad.select("meta[property='og:description']").attr("content").split("'s")[0]);
+
+                // Collects the basic information of the author, date, birthday and etc.
+                Element tableOne = doc.getElementsByClass("table_pro_overview").first();
+                builder.setLastActive(tableOne.select("tr").first().select("td").text());
+                builder.setBirthday(tableOne.select("tr").first().nextElementSibling().select("td").text());
+                builder.setGender(tableOne.select("tr").first().nextElementSibling().nextElementSibling().select("td").text());
+                builder.setLocation(tableOne.select("tr").first().nextElementSibling().nextElementSibling().nextElementSibling().select("td").text());
+                builder.setHomepage(tableOne.select("tr").last().select("td").select("a").text());
+
+                // Collects the author statistics, improved as of v1.1.5
+                Element table = doc.getElementsByClass("table_pro_overview").last();
+                // Sets the total series.
+                builder.setTotalSeries(Integer.parseInt(table.select("tr").first().select("td").text()));
+                // Sets the total words.
+                builder.setTotalWords(Long.parseLong(table.select("tr").first().nextElementSibling().select("td").text().replaceAll("[^\\d]", "")));
+                // Sets the total views.
+                builder.setTotalViews(Long.parseLong(table.select("tr").first().nextElementSibling().nextElementSibling().select("td").text().replaceAll("[^\\d]", "")));
+                // Sets the total reviews received.
+                builder.setTotalReviews(Integer.parseInt(table.select("tr").first().nextElementSibling().nextElementSibling()
+                        .nextElementSibling().select("td").text().replaceAll("[^\\d]", "")));
+                // Sets the total readers.
+                builder.setTotalReaders(Integer.parseInt(table.select("tr").first().nextElementSibling().nextElementSibling()
+                        .nextElementSibling().nextElementSibling().select("td").text().replaceAll("[^\\d]", "")));
+                // Sets the total followers.
+                builder.setTotalFollowers(Integer.parseInt(table.select("tr").last().select("td").text().replaceAll("[^\\d]", "")));
+                // Sets the URL.
                 builder.setUrl(url);
                 return Optional.of(builder.build());
             } catch (IOException ignore) {
