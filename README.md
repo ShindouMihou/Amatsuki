@@ -77,6 +77,17 @@ new Amatsuki().getUserFromUrl("https://www.scribblehub.com/profile/24680/mihou/"
 new Amatsuki().getStoryFromUrl("https://www.scribblehub.com/series/193852/a-dream-foretold/");
 ```
 
+#### To collect data about the current trending at the time of execution.
+```java
+new Amatsuki().getTrending();
+```
+
+#### To collect data about the current latest series or latest updates at the time of execution.
+```java
+new Amatsuki().getLatestSeries(); // latest series.
+new Amatsuki().getLatestUpdates(); // latest updates.
+```
+
 #### You can also specify a timeout if you wish, by default, the timeout is 5 seconds.
 ```java
 new Amatsuki().searchUser("Mihou", 30000); // Timeout is in millis.
