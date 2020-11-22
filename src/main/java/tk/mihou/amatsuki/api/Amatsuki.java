@@ -1,6 +1,7 @@
 package tk.mihou.amatsuki.api;
 
 import tk.mihou.amatsuki.api.connection.AmatsukiConnector;
+import tk.mihou.amatsuki.api.enums.OrderBy;
 import tk.mihou.amatsuki.api.enums.Rankings;
 import tk.mihou.amatsuki.entities.latest.LatestUpdatesResult;
 import tk.mihou.amatsuki.entities.story.Story;
@@ -83,9 +84,28 @@ public class Amatsuki {
      * @return List<StoryResults>
      */
     public CompletableFuture<List<StoryResults>> getTrending(){
-        return connector.getRanking(Rankings.RISING, defTimeout);
+        return connector.getRanking(Rankings.RISING, OrderBy.DAILY, defTimeout);
     }
 
+    /**
+     * Retrieves the current trending on ScribbleHub.
+     * @param order The time order of the ranking.
+     * @return List<StoryResults>
+     */
+    public CompletableFuture<List<StoryResults>> getTrending(OrderBy order){
+        return connector.getRanking(Rankings.RISING, order, defTimeout);
+    }
+
+
+    /**
+     * Retrieves the current trending on ScribbleHub.
+     * @param order The time order of the ranking.
+     * @param timeout The time limit (millis).
+     * @return List<StoryResults>
+     */
+    public CompletableFuture<List<StoryResults>> getTrending(OrderBy order, int timeout){
+        return connector.getRanking(Rankings.RISING, order, timeout);
+    }
 
     /**
      * Retrieves the current trending on ScribbleHub.
@@ -93,7 +113,7 @@ public class Amatsuki {
      * @return List<StoryResults>
      */
     public CompletableFuture<List<StoryResults>> getTrending(int timeout){
-        return connector.getRanking(Rankings.RISING, timeout);
+        return connector.getRanking(Rankings.RISING, OrderBy.DAILY, timeout);
     }
 
     /**
@@ -101,9 +121,17 @@ public class Amatsuki {
      * @return List<StoryResults>
      */
     public CompletableFuture<List<StoryResults>> getCertainRankings(Rankings ranking){
-        return connector.getRanking(ranking, defTimeout);
+        return connector.getRanking(ranking, OrderBy.DAILY, defTimeout);
     }
 
+    /**
+     * Retrieves a certain specified ranking from ScribbleHub in a specific time order.
+     * @param order The time order of the ranking.
+     * @return List<StoryResults>
+     */
+    public CompletableFuture<List<StoryResults>> getCertainRankings(Rankings ranking, OrderBy order){
+        return connector.getRanking(ranking, order, defTimeout);
+    }
 
     /**
      * Retrieves a certain specified ranking from ScribbleHub.
@@ -111,7 +139,17 @@ public class Amatsuki {
      * @return List<StoryResults>
      */
     public CompletableFuture<List<StoryResults>> getCertainRankings(Rankings ranking, int timeout){
-        return connector.getRanking(ranking, timeout);
+        return connector.getRanking(ranking, OrderBy.DAILY, timeout);
+    }
+
+    /**
+     * Retrieves a certain specified ranking from ScribbleHub in a specific time order.
+     * @param timeout The time limit (millis).
+     * @param order The time order of the ranking.
+     * @return List<StoryResults>
+     */
+    public CompletableFuture<List<StoryResults>> getCertainRankings(Rankings ranking, OrderBy order, int timeout){
+        return connector.getRanking(ranking, order, timeout);
     }
 
     /**

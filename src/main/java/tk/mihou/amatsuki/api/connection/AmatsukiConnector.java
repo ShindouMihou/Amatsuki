@@ -4,6 +4,7 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
+import tk.mihou.amatsuki.api.enums.OrderBy;
 import tk.mihou.amatsuki.api.enums.Rankings;
 import tk.mihou.amatsuki.entities.latest.LatestUpdatesBuilder;
 import tk.mihou.amatsuki.entities.latest.LatestUpdatesResult;
@@ -83,10 +84,10 @@ public class AmatsukiConnector {
         });
     }
 
-    public CompletableFuture<List<StoryResults>> getRanking(Rankings ranking, int timeout){
+    public CompletableFuture<List<StoryResults>> getRanking(Rankings ranking, OrderBy order, int timeout){
         return CompletableFuture.supplyAsync(() -> {
             try {
-                Document doc = Jsoup.connect(String.format("https://www.scribblehub.com/series-ranking/?sort=%d&order=1", ranking.getLocation()))
+                Document doc = Jsoup.connect(String.format("https://www.scribblehub.com/series-ranking/?sort=%d&order=%d", ranking.getLocation(), order.getLocation()))
                         .userAgent(userAgent)
                         .timeout(timeout).get();
                 List<StoryResults> panels = new ArrayList<>();
