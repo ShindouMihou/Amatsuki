@@ -83,7 +83,7 @@ public class Amatsuki {
      * @return List<FrontpagePanel>
      */
     public CompletableFuture<List<FrontpagePanel>> getTrending(){
-        return connector.getLatestSeries(defTimeout);
+        return connector.getTrending(defTimeout);
     }
 
 
