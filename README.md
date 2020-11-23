@@ -1,9 +1,7 @@
 [![](https://jitpack.io/v/ShindouMihou/amatsuki.svg)](https://jitpack.io/#ShindouMihou/amatsuki)
 # Amatsuki
 
-Amatsuki is an asychronous simple text scraper for ScribbleHub built in Java, the main purpose for this library is to scrape public user data (bio, followed by x users, etc...) , or story data (synopsis, story title, thumbnail, etc...). The library is compatiable with any Java version above 1.8 (standard), and heavily uses on CompletableFutures and Optionals to achieve its results.
-
-The main use for this library is to search for stories, or users in the website ScribbleHub, and is mostly implemented on Discord Bots instead of actual heavy load programs. Please keep in mind that this library is still a mess, but it achieves what it can. 
+Amatsuki is an asychronous simple text scraper for ScribbleHub built in Java, the main purpose for this library is to scrape public user data (bio, followed by x users, etc...) , or story data (synopsis, story title, thumbnail, etc...) from the https://scribblehub.com site.
 
 If you wish to improve the library, please feel free to do so.
 
@@ -51,11 +49,10 @@ As of now, the only way to get this is through Jitpack which is still a simple w
 
 ## How to use?
 
-Amatsuki has a single class that has everything needed, this class is called ``Amatsuki`` which is as expected.
+Amatsuki has a single class that has everything needed, this class is called ``Amatsuki`` and all the methods are named after their use which should simplifies everything.
 If you also want to, you can improve everything to your liking as I will only be using this for the basic tasks.
 
-Most of these results in an ``CompletableFuture<Optional>``, Optionals are used to protect against null whilst CompletableFuture
-is used for asynchronous tasks.
+Please note, that all if not most of these methods returns either an CompletableFuture or an Optional, if you do not know how to use them, please search around the web for some guides. \w/
 
 #### To search for a story (using keyword).
 ```java
