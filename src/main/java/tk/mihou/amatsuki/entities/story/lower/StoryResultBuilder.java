@@ -19,6 +19,7 @@ public class StoryResultBuilder {
     private int readers;
     private int reviews;
     private String word;
+    private String authorURL;
     private String lastUpdated;
 
 
@@ -86,7 +87,11 @@ public class StoryResultBuilder {
         this.lastUpdated = lastUpdated;
     }
 
+    public void setAuthorURL(String authorURL){
+        this.authorURL = authorURL;
+    }
+
     public StoryResults build(){
-        return new StoryResults(name, thumbnail, url, shortSynopsis, fullSynopsis, genres, creator, views, rating, favorites, chapters, chw, readers, reviews, lastUpdated, word);
+        return new StoryResults(name, thumbnail, url, shortSynopsis, fullSynopsis, genres, creator, views, rating, favorites, chapters, chw, readers, reviews, lastUpdated, word, authorURL);
     }
 }

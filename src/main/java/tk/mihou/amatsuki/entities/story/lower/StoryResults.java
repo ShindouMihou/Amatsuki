@@ -26,8 +26,10 @@ public class StoryResults {
     private int reviews;
     private String lastUpdated;
     private String word;
+    private String authorURL;
 
-    public StoryResults(String name, String thumbnail, String url, String shortSynopsis, String fullSynopsis, List<String> genres, String creator, String views, Double rating, long favorites, int chapters, int chw, int readers, int reviews, String lastUpdated, String word) {
+    public StoryResults(String name, String thumbnail, String url, String shortSynopsis, String fullSynopsis, List<String> genres, String creator,
+                        String views, Double rating, long favorites, int chapters, int chw, int readers, int reviews, String lastUpdated, String word, String authorURL) {
         this.name = name;
         this.thumbnail = thumbnail;
         this.url = url;
@@ -44,6 +46,15 @@ public class StoryResults {
         this.reviews = reviews;
         this.lastUpdated = lastUpdated;
         this.word = word;
+        this.authorURL = authorURL;
+    }
+
+    /**
+     * Returns the URL for the author.
+     * @return author url.
+     */
+    public String getCreatorURL(){
+        return authorURL;
     }
 
     /**
@@ -162,7 +173,7 @@ public class StoryResults {
      * Transforms the result into a story, returns a CompletableFuture<Optional> to prevent mishaps.
      * @return Story.
      */
-    public CompletableFuture<Optional<Story>> transformToStory(){
+    public CompletableFuture<Story> transformToStory(){
         return new Amatsuki().getStoryFromUrl(url);
     }
 

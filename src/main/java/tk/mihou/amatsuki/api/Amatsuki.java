@@ -32,7 +32,7 @@ public class Amatsuki {
      * @param query the keyword to query.
      * @return User.
      */
-    public CompletableFuture<Optional<List<UserResults>>> searchUser(String query) {
+    public CompletableFuture<List<UserResults>> searchUser(String query) {
         return connector.searchUser(query, defTimeout);
     }
 
@@ -41,7 +41,7 @@ public class Amatsuki {
      * @param query the keyword to query.
      * @return Story.
      */
-    public CompletableFuture<Optional<List<StoryResults>>> searchStory(String query) {
+    public CompletableFuture<List<StoryResults>> searchStory(String query) {
         return connector.searchStory(query, defTimeout);
     }
 
@@ -157,7 +157,7 @@ public class Amatsuki {
      * @param url the url to collect from.
      * @return Story.
      */
-    public CompletableFuture<Optional<Story>> getStoryFromUrl(String url) {
+    public CompletableFuture<Story> getStoryFromUrl(String url) {
         return connector.getStoryByUrl(url, defTimeout);
     }
 
@@ -166,7 +166,7 @@ public class Amatsuki {
      * @param url the URL to collect from.
      * @return User.
      */
-    public CompletableFuture<Optional<User>> getUserFromUrl(String url) {
+    public CompletableFuture<User> getUserFromUrl(String url) {
         return connector.getUserFromUrl(url, defTimeout);
     }
 
@@ -176,7 +176,7 @@ public class Amatsuki {
      * @param timeout the time limit. (millis)
      * @return Story.
      */
-    public CompletableFuture<Optional<List<StoryResults>>> searchStory(String query, int timeout) {
+    public CompletableFuture<List<StoryResults>> searchStory(String query, int timeout) {
         return connector.searchStory(query, timeout);
     }
 
@@ -186,7 +186,7 @@ public class Amatsuki {
      * @param timeout the time limit. (millis)
      * @return User
      */
-    public CompletableFuture<Optional<List<UserResults>>> searchUser(String query, int timeout) {
+    public CompletableFuture<List<UserResults>> searchUser(String query, int timeout) {
         return connector.searchUser(query, timeout);
     }
 
@@ -196,7 +196,7 @@ public class Amatsuki {
      * @param timeout the time limit. (millis)
      * @return Story.
      */
-    public CompletableFuture<Optional<Story>> getStoryFromUrl(String url, int timeout) {
+    public CompletableFuture<Story> getStoryFromUrl(String url, int timeout) {
         return connector.getStoryByUrl(url, timeout);
     }
 
@@ -206,7 +206,7 @@ public class Amatsuki {
      * @param timeout the time limit. (millis)
      * @return User.
      */
-    public CompletableFuture<Optional<User>> getUserFromUrl(String url, int timeout) {
+    public CompletableFuture<User> getUserFromUrl(String url, int timeout) {
         return connector.getUserFromUrl(url, timeout);
     }
 }

@@ -47,7 +47,7 @@ public class UserResults {
      * Transforms a result into a user, returns a CompletableFuture<Optional> to prevent mishaps.
      * @return User.
      */
-    public CompletableFuture<Optional<User>> transformToUser(){
+    public CompletableFuture<User> transformToUser(){
         return new Amatsuki().getUserFromUrl(url);
     }
 

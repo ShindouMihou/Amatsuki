@@ -61,7 +61,7 @@ public class AmatsukiConnector {
         this.userAgent = userAgent;
     }
 
-    public CompletableFuture<Optional<List<UserResults>>> searchUser(String query, int timeout){
+    public CompletableFuture<List<UserResults>> searchUser(String query, int timeout){
         return CompletableFuture.supplyAsync(() -> {
             try {
                 List<UserResults> collection = new ArrayList<>();
@@ -77,10 +77,10 @@ public class AmatsukiConnector {
                     builder.setLink(resultA.attr("href"));
                     collection.add(builder.build());
                 })));
-                return collection.isEmpty() ? Optional.empty() : Optional.of(collection);
+                return collection;
             } catch (IOException ignore) {
             }
-            return Optional.empty();
+            return null;
         });
     }
 
@@ -128,7 +128,8 @@ public class AmatsukiConnector {
                             .nextElementSibling().nextElementSibling().ownText().replaceAll("[^\\d.km]", ""));
                     builder.setLastUpdated(stats.getElementsByTag("span").first().nextElementSibling().nextElementSibling().nextElementSibling().nextElementSibling()
                             .nextElementSibling().nextElementSibling().nextElementSibling().ownText());
-                    builder.setCreator(stats.getElementsByTag("span").last().ownText());
+                    builder.setCreator(stats.getElementsByTag("span").last().getElementsByTag("span").first().getElementsByTag("a").first().ownText());
+                    builder.setAuthorURL(stats.getElementsByTag("span").last().getElementsByTag("span").first().getElementsByTag("a").first().attr("href"));
                     panels.add(builder.build());
                 });
                 return panels;
@@ -183,7 +184,8 @@ public class AmatsukiConnector {
                             .nextElementSibling().nextElementSibling().ownText().replaceAll("[^\\d.km]", ""));
                     builder.setLastUpdated(stats.getElementsByTag("span").first().nextElementSibling().nextElementSibling().nextElementSibling().nextElementSibling()
                             .nextElementSibling().nextElementSibling().nextElementSibling().ownText());
-                    builder.setCreator(stats.getElementsByTag("span").last().ownText());
+                    builder.setCreator(stats.getElementsByTag("span").last().getElementsByTag("span").first().getElementsByTag("a").first().ownText());
+                    builder.setAuthorURL(stats.getElementsByTag("span").last().getElementsByTag("span").first().getElementsByTag("a").first().attr("href"));
                     panels.add(builder.build());
                 });
                 return panels;
@@ -238,7 +240,7 @@ public class AmatsukiConnector {
         }, executorService);
     }
 
-    public CompletableFuture<Optional<List<StoryResults>>> searchStory(String query, int timeout){
+    public CompletableFuture<List<StoryResults>> searchStory(String query, int timeout){
         return CompletableFuture.supplyAsync(() -> {
             try {
                 List<StoryResults> stories = new ArrayList<>();
@@ -283,17 +285,19 @@ public class AmatsukiConnector {
                             .nextElementSibling().nextElementSibling().ownText().replaceAll("[^\\d.km]", ""));
                     builder.setLastUpdated(stats.getElementsByTag("span").first().nextElementSibling().nextElementSibling().nextElementSibling().nextElementSibling()
                             .nextElementSibling().nextElementSibling().nextElementSibling().ownText());
-                    builder.setCreator(stats.getElementsByTag("span").last().ownText());
+                    builder.setCreator(stats.getElementsByTag("span").last().getElementsByTag("span").first().getElementsByTag("a").first().ownText());
+                    builder.setAuthorURL(stats.getElementsByTag("span").last().getElementsByTag("span").first().getElementsByTag("a").first().attr("href"));
+                    System.out.println(stats.getElementsByTag("span").last().getElementsByTag("span").first().getElementsByTag("a").first().attr("href"));
                     stories.add(builder.build());
                 });
-                return stories.isEmpty() ? Optional.empty() : Optional.of(stories);
+                return stories;
             } catch (IOException ignore) {
             }
-            return Optional.empty();
+            return null;
         }, executorService);
     }
 
-    public CompletableFuture<Optional<Story>> getStoryByUrl(String url, int timeout){
+    public CompletableFuture<Story> getStoryByUrl(String url, int timeout){
         return CompletableFuture.supplyAsync(() -> {
             try {
                 StoryBuilder entity = new StoryBuilder();
@@ -344,14 +348,14 @@ public class AmatsukiConnector {
                 // I wonder why I was getting the URL when there is already a URL provided?
                 entity.setUrl(url);
 
-                return Optional.of(entity.build());
+                return entity.build();
             } catch (IOException ignore) {
             }
-            return Optional.empty();
+            return null;
         }, executorService);
     }
 
-    public CompletableFuture<Optional<User>> getUserFromUrl(String url, int timeout){
+    public CompletableFuture<User> getUserFromUrl(String url, int timeout){
         return CompletableFuture.supplyAsync(() -> {
             UserBuilder builder = new UserBuilder();
             try {
@@ -396,10 +400,10 @@ public class AmatsukiConnector {
                 builder.setTotalFollowers(Integer.parseInt(table.select("tr").last().select("td").text().replaceAll("[^\\d]", "")));
                 // Sets the URL.
                 builder.setUrl(url);
-                return Optional.of(builder.build());
+                return builder.build();
             } catch (IOException ignore) {
             }
-            return Optional.empty();
+            return null;
         }, executorService);
     }
 
