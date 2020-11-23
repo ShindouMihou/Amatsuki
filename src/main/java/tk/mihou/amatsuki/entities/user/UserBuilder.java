@@ -79,7 +79,7 @@ public class UserBuilder {
     }
 
     public User build(){
-        return new User(totalWords, totalSeries, totalViews, totalReviews, totalReaders, totalFollowers, name, bio, url, avatar,
+        return new User(totalWords, totalSeries, totalViews, totalReviews, totalReaders, totalFollowers, url, name, bio, avatar,
                 birthday, gender, location, homepage, lastActive);
     }
 
