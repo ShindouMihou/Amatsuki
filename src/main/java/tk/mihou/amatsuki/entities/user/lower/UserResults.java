@@ -4,7 +4,6 @@ import tk.mihou.amatsuki.api.Amatsuki;
 import tk.mihou.amatsuki.entities.user.User;
 
 import java.util.Objects;
-import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
 public class UserResults {

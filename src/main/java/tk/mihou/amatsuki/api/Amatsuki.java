@@ -9,7 +9,6 @@ import tk.mihou.amatsuki.entities.story.lower.StoryResults;
 import tk.mihou.amatsuki.entities.user.User;
 import tk.mihou.amatsuki.entities.user.lower.UserResults;
 import java.util.List;
-import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
 public class Amatsuki {
