@@ -54,7 +54,7 @@ As of now, the only way to get this is through Jitpack which is still a simple w
 Amatsuki has a single class that has everything needed, this class is called ``Amatsuki`` which is as expected.
 If you also want to, you can improve everything to your liking as I will only be using this for the basic tasks.
 
-All of these results in an ``CompletableFuture<Optional>``, Optionals are used to protect against null whilst CompletableFuture
+Most of these results in an ``CompletableFuture<Optional>``, Optionals are used to protect against null whilst CompletableFuture
 is used for asynchronous tasks.
 
 #### To search for a story (using keyword).
@@ -79,13 +79,24 @@ new Amatsuki().getStoryFromUrl("https://www.scribblehub.com/series/193852/a-drea
 
 #### To collect data about the current trending at the time of execution.
 ```java
-new Amatsuki().getTrending();
+new Amatsuki().getTrending(); // Gets the trending (daily).
+new Amatsuki().getTrending(OrderBy.WEEKLY); // Gets the weekly trending.
 ```
 
 #### To collect data about the current latest series or latest updates at the time of execution.
 ```java
 new Amatsuki().getLatestSeries(); // latest series.
 new Amatsuki().getLatestUpdates(); // latest updates.
+```
+
+#### To collect data about a certain ranking, simply use.
+```java
+new Amatsuki().getCertainRankings();
+```
+###### Example Usage:
+```java
+new Amatsuki().getCertainRankings(Rankings.ACTIVITY, OrderBy.WEEKLY); // This will get the Activity Rankings, ordered by weekly.
+new Amatsuki().getCertainRankings(Rankings.ACTIVITY); // Exactly the same as the first one except this uses the default order (Daily).
 ```
 
 #### You can also specify a timeout if you wish, by default, the timeout is 5 seconds.
@@ -96,5 +107,4 @@ new Amatsuki().searchUser("Mihou", 30000); // Timeout is in millis.
 #### Known issues
 Here are the currently known issues, if anyone knows the fix, feel free to send a PR.
 
-1. IOException: Underlying Input Stream Returned Zero Bytes.
-##### Occurrs in both 30 seconds and 5 second timeouts.
+1. IOException: Underlying Input Stream Returned Zero Bytes. [haven't occurred as of lately]
