@@ -142,7 +142,7 @@ public class AmatsukiConnector {
     public CompletableFuture<List<StoryResults>> getLatestSeries(int timeout){
         return CompletableFuture.supplyAsync(() -> {
             try {
-                Document doc = Jsoup.connect("https://www.scribblehub.com/")
+                Document doc = Jsoup.connect("https://www.scribblehub.com/latest-series/")
                         .userAgent(userAgent)
                         .timeout(timeout).get();
                 List<StoryResults> panels = new ArrayList<>();
