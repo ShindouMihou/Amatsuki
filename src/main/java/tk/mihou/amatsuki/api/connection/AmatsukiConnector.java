@@ -31,7 +31,7 @@ import java.util.logging.Logger;
 public class AmatsukiConnector {
 
     private final ExecutorService executorService = Executors.newSingleThreadExecutor();
-    private String userAgent = "Amatsuki-library/1.2.4r1 (Language=Java/1.8)";
+    private String userAgent = "Amatsuki-library/1.2.4r2 (Language=Java/1.8)";
 
     /*
     - Amatsuki Connector, the base connector for all.
@@ -286,7 +286,6 @@ public class AmatsukiConnector {
                             .nextElementSibling().nextElementSibling().nextElementSibling().ownText());
                     builder.setCreator(stats.getElementsByTag("span").last().getElementsByTag("span").first().getElementsByTag("a").first().ownText());
                     builder.setAuthorURL(stats.getElementsByTag("span").last().getElementsByTag("span").first().getElementsByTag("a").first().attr("href"));
-                    System.out.println(stats.getElementsByTag("span").last().getElementsByTag("span").first().getElementsByTag("a").first().attr("href"));
                     stories.add(builder.build());
                 });
                 return stories;
