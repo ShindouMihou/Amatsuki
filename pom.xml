@@ -6,7 +6,7 @@
 
     <groupId>tk.mihou</groupId>
     <artifactId>Amatsuki</artifactId>
-    <version>1.2.4r1</version>
+    <version>1.2.4r3</version>
     <build>
         <plugins>
             <plugin>
