@@ -1,6 +1,12 @@
 package tk.mihou.amatsuki.entities.user;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.Date;
 import java.util.Objects;
+import java.util.Optional;
 
 public class User {
 
@@ -17,10 +23,12 @@ public class User {
     private String birthday;
     private String gender;
     private String location;
+    private int uid;
     private String homepage;
     private String lastActive;
 
-    public User(long totalWords, int totalSeries, long totalViews, int totalReviews, int totalReaders, int totalFollowers, String url, String name, String bio, String avatar, String birthday, String gender, String location, String homepage, String lastActive) {
+    public User(int uid, long totalWords, int totalSeries, long totalViews, int totalReviews, int totalReaders, int totalFollowers, String url, String name, String bio, String avatar, String birthday, String gender, String location, String homepage, String lastActive) {
+        this.uid = uid;
         this.totalWords = totalWords;
         this.totalSeries = totalSeries;
         this.totalViews = totalViews;
@@ -39,11 +47,35 @@ public class User {
     }
 
     /**
+     * Retrieves the user's RSS feed.
+     * @return RSS feed.
+     */
+    public String getRSS(){
+        return String.format("https://www.scribblehub.com/rssfeed.php?type=author&uid=%d", uid);
+    }
+
+    /**
+     * Returns the user's identification number.
+     * @return the user's identification number.
+     */
+    public int getUID(){
+        return uid;
+    }
+
+    /**
      * Gets the user's birthday if specified.
      * @return the birthday.
      */
     public String getBirthday() {
         return birthday;
+    }
+
+    /**
+     * Returns the Date version of the birthday, optional due to SH allowing others to hide their birthday.
+     * @return the birthday.
+     */
+    public Optional<LocalDate> parseBirthday(){
+        return birthday.equalsIgnoreCase("--") ? Optional.empty() : Optional.of(LocalDate.parse(birthday, DateTimeFormatter.ofPattern("MMM dd, yyyy")));
     }
 
     /**

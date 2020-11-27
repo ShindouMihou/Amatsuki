@@ -9,6 +9,7 @@ public class Story {
     private final String synopsis;
     private final String url;
     private final String image;
+    private final int sid;
     private final String creator;
     private final String views;
     private final Double rating;
@@ -21,7 +22,7 @@ public class Story {
     private final List<String> tags;
 
     public Story(String title, String synopsis, String url, String image, String creator, Double rating, String views,
-                 long favorites, int chapters, int chw, int ratings, int readers, List<String> genres, List<String> tags) {
+                 long favorites, int chapters, int chw, int ratings, int readers, List<String> genres, List<String> tags, int sid) {
         this.title = title;
         this.synopsis = synopsis;
         this.url = url;
@@ -36,6 +37,23 @@ public class Story {
         this.genres = genres;
         this.tags = tags;
         this.ratings = ratings;
+        this.sid = sid;
+    }
+
+    /**
+     * Retrieves the story's RSS feed.
+     * @return RSS feed.
+     */
+    public String getRSS(){
+        return String.format("https://www.scribblehub.com/rssfeed.php?type=series&sid=%d", sid);
+    }
+
+    /**
+     * Returns the story's identification number.
+     * @return the story's identification number.
+     */
+    public int getSID(){
+        return sid;
     }
 
     /**

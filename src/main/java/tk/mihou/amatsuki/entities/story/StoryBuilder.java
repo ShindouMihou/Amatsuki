@@ -10,6 +10,8 @@ public class StoryBuilder {
     private int chapters, chapterPerWeek, ratings, readers;
     private List<String> genres;
     private List<String> tags;
+    private int sid;
+
     public void setTitle(String title) {
         this.title = title;
     }
@@ -66,8 +68,12 @@ public class StoryBuilder {
         this.tags = tags;
     }
 
+    public void setSID(int sid){
+        this.sid = sid;
+    }
+
     public Story build(){
-        return new Story(title, synopsis, url, image, creator, rating, views, favorites, chapters, chapterPerWeek, ratings, readers, genres, tags);
+        return new Story(title, synopsis, url, image, creator, rating, views, favorites, chapters, chapterPerWeek, ratings, readers, genres, tags, sid);
     }
 
 }

@@ -31,7 +31,7 @@ import java.util.logging.Logger;
 public class AmatsukiConnector {
 
     private final ExecutorService executorService = Executors.newSingleThreadExecutor();
-    private String userAgent = "Amatsuki-library/1.2.4r2 (Language=Java/1.8)";
+    private String userAgent = "Amatsuki-library/1.2.4r3 (Language=Java/1.8)";
 
     /*
     - Amatsuki Connector, the base connector for all.
@@ -343,6 +343,9 @@ public class AmatsukiConnector {
                 entity.setImage(doc.select("meta[name='twitter:image']").attr("content"));
                 entity.setCreator(doc.select("meta[name='twitter:creator']").attr("content"));
 
+                // Retrieve SID (UID but for series).
+                entity.setSID(Integer.parseInt(doc.select("div.site").first().getElementsByClass("site-content-contain").first().select("input[id='mypostid']").attr("value")));
+
                 // I wonder why I was getting the URL when there is already a URL provided?
                 entity.setUrl(url);
 
@@ -396,6 +399,9 @@ public class AmatsukiConnector {
                         .nextElementSibling().nextElementSibling().select("td").text().replaceAll("[^\\d]", "")));
                 // Sets the total followers.
                 builder.setTotalFollowers(Integer.parseInt(table.select("tr").last().select("td").text().replaceAll("[^\\d]", "")));
+
+                // Retrieve UID.
+                builder.setUID(Integer.parseInt(metad.select("input[name='authorid']").first().attr("value")));
                 // Sets the URL.
                 builder.setUrl(url);
                 return builder.build();

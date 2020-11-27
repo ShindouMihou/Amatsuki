@@ -16,6 +16,7 @@ public class UserBuilder {
     private String gender;
     private String location;
     private String homepage;
+    private int uid;
     private String lastActive;
 
     public void setAvatar(String avatar) {
@@ -40,6 +41,10 @@ public class UserBuilder {
 
     public void setLastActive(String lastActive) {
         this.lastActive = lastActive;
+    }
+
+    public void setUID(int uid){
+        this.uid = uid;
     }
 
     public void setTotalWords(long totalWords) {
@@ -79,7 +84,7 @@ public class UserBuilder {
     }
 
     public User build(){
-        return new User(totalWords, totalSeries, totalViews, totalReviews, totalReaders, totalFollowers, url, name, bio, avatar,
+        return new User(uid, totalWords, totalSeries, totalViews, totalReviews, totalReaders, totalFollowers, url, name, bio, avatar,
                 birthday, gender, location, homepage, lastActive);
     }
 
