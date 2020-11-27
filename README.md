@@ -52,14 +52,14 @@ As of now, the only way to get this is through Jitpack which is still a simple w
 Amatsuki has a single class that has everything needed, this class is called ``Amatsuki`` and all the methods are named after their use which should simplifies everything.
 If you also want to, you can improve everything to your liking as I will only be using this for the basic tasks.
 
-Please note, that all if not most of these methods returns either an CompletableFuture or an Optional, if you do not know how to use them, please search around the web for some guides. \w/
+All the results here will return back an CompletableFuture which will either contain the value or not.
 
 #### To search for a story (using keyword).
 ```java
 new Amatsuki().searchStory("A Dream Foretold");
 ```
 
-#### To search for a user (using keyword), returns CompletableFuture<Optional>.
+#### To search for a user (using keyword).
 ```java
 new Amatsuki().searchUser("Mihou");
 ```
