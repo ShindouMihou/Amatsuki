@@ -286,7 +286,6 @@ public class AmatsukiConnector {
                             .nextElementSibling().nextElementSibling().nextElementSibling().ownText());
                     builder.setCreator(stats.getElementsByTag("span").last().getElementsByTag("span").first().getElementsByTag("a").first().ownText());
                     builder.setAuthorURL(stats.getElementsByTag("span").last().getElementsByTag("span").first().getElementsByTag("a").first().attr("href"));
-                    System.out.println(stats.getElementsByTag("span").last().getElementsByTag("span").first().getElementsByTag("a").first().attr("href"));
                     stories.add(builder.build());
                 });
                 return stories;
