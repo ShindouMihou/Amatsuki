@@ -6,6 +6,8 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import tk.mihou.amatsuki.api.enums.OrderBy;
 import tk.mihou.amatsuki.api.enums.Rankings;
+import tk.mihou.amatsuki.api.enums.SortBy;
+import tk.mihou.amatsuki.api.enums.StoryStatus;
 import tk.mihou.amatsuki.entities.latest.LatestUpdatesBuilder;
 import tk.mihou.amatsuki.entities.latest.LatestUpdatesResult;
 import tk.mihou.amatsuki.entities.story.Story;
@@ -81,6 +83,67 @@ public class AmatsukiConnector {
             }
             return null;
         });
+    }
+
+    /**
+     * Used to search on Series Finder, please use SeriesFinder class instead of this.
+     * @param url the link to the series.
+     * @return List<StoryResults>
+     */
+    public CompletableFuture<List<StoryResults>> seriesFinderSearch(String url, int timeout){
+        return CompletableFuture.supplyAsync(() -> {
+            try {
+                List<StoryResults> stories = new ArrayList<>();
+                Document doc = Jsoup.connect(url)
+                        .referrer("https://scribblehub.com/series-finder/?sf=2")
+                        .userAgent(userAgent)
+                        .timeout(timeout).get();
+                doc.getElementsByClass("search_main_box").forEach(element -> {
+                    StoryResultBuilder builder = new StoryResultBuilder();
+
+                    // Gets the thumbnail and rating.
+                    builder.setThumbnail(element.getElementsByClass("search_img").select("img").attr("src"));
+                    builder.setRating(Double.parseDouble(element.getElementsByClass("search_img").first().getElementsByClass("search_ratings").first().ownText().replaceAll("[^\\d.]", "")));
+
+                    // Get the extra details.
+                    Element body = element.getElementsByClass("search_body").first();
+                    builder.setName(body.getElementsByClass("search_title").select("a").first().text());
+                    builder.setUrl(body.getElementsByClass("search_title").select("a").attr("href"));
+
+                    // Retrieve both synopsis.
+                    StringBuilder str = new StringBuilder();
+                    builder.setShortSynopsis(body.ownText());
+                    str.append(body.ownText());
+                    body.select("span.testhide").eachText().forEach(s -> str.append("\n").append(s));
+                    builder.setFullSynopsis(str.toString().replaceAll("<<less", ""));
+
+                    // Retrieve all the genres.
+                    List<String> genres = new ArrayList<>();
+                    body.getElementsByClass("search_genre").first().getElementsByTag("a").forEach(element1 -> genres.add(element1.ownText()));
+                    builder.setGenres(genres);
+
+                    // Retrieve all statistics.
+                    Element stats = body.getElementsByClass("search_stats").first();
+                    builder.setViews(stats.getElementsByTag("span").first().ownText().replaceAll("[^\\d.km]", ""));
+                    builder.setFavorites(Long.parseLong(stats.getElementsByTag("span").first().nextElementSibling().ownText().replaceAll("[^\\d]", "")));
+                    builder.setChapters(Integer.parseInt(stats.getElementsByTag("span").first().nextElementSibling().nextElementSibling().ownText().replaceAll("[^\\d]", "")));
+                    builder.setChw(Integer.parseInt(stats.getElementsByTag("span").first().nextElementSibling().nextElementSibling().nextElementSibling().ownText().replaceAll("[^\\d]", "")));
+                    builder.setReaders(Integer.parseInt(stats.getElementsByTag("span").first().nextElementSibling().nextElementSibling().nextElementSibling().nextElementSibling().ownText().replaceAll("[^\\d]", "")));
+                    builder.setReviews(Integer.parseInt(stats.getElementsByTag("span").first().nextElementSibling().nextElementSibling().nextElementSibling().nextElementSibling()
+                            .nextElementSibling().ownText().replaceAll("[^\\d]", "")));
+                    builder.setWord(stats.getElementsByTag("span").first().nextElementSibling().nextElementSibling().nextElementSibling().nextElementSibling()
+                            .nextElementSibling().nextElementSibling().ownText().replaceAll("[^\\d.km]", ""));
+                    builder.setLastUpdated(stats.getElementsByTag("span").first().nextElementSibling().nextElementSibling().nextElementSibling().nextElementSibling()
+                            .nextElementSibling().nextElementSibling().nextElementSibling().ownText());
+                    builder.setCreator(stats.getElementsByTag("span").last().getElementsByTag("span").first().getElementsByTag("a").first().ownText());
+                    builder.setAuthorURL(stats.getElementsByTag("span").last().getElementsByTag("span").first().getElementsByTag("a").first().attr("href"));
+                    stories.add(builder.build());
+                });
+                return stories;
+            } catch (IOException ignore) {
+            }
+            return null;
+        }, executorService);
     }
 
     public CompletableFuture<List<StoryResults>> getRanking(Rankings ranking, OrderBy order, int timeout){
