@@ -33,7 +33,7 @@ import java.util.logging.Logger;
 public class AmatsukiConnector {
 
     private final ExecutorService executorService = Executors.newSingleThreadExecutor();
-    private String userAgent = "Amatsuki-library/1.2.4r3 (Language=Java/1.8)";
+    private String userAgent = "Amatsuki-library/1.2.5r1 (Language=Java/1.8)";
 
     /*
     - Amatsuki Connector, the base connector for all.
