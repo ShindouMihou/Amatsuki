@@ -31,7 +31,7 @@ import java.util.logging.Logger;
 public class AmatsukiConnector {
 
     private final ExecutorService executorService = Executors.newSingleThreadExecutor();
-    private String userAgent = "Amatsuki-library/1.2.6r1 (Language=Java/1.8)";
+    private String userAgent = "Amatsuki-library/1.2.6r2 (Language=Java/1.8)";
 
     /**
      * Modifies the user-agent of the client, can be anything but I recommend not abusing, as well as using the right
@@ -413,7 +413,7 @@ public class AmatsukiConnector {
                 if(doc.getElementsByClass("error_msg_profile").first() != null){
                     if(doc.getElementsByClass("error_msg_profile").first().ownText().contains("disable their profile.")){
                         // Grab the UID (since this is important) for RSS.
-                        builder.setUID(Integer.parseInt(doc.select("link[rel='canonical']").first().attr("href").replaceAll("https://www.scribblehub.com/profile/", "").replaceAll("/", "")));
+                        builder.setUID(Integer.parseInt(url.replaceAll("[^\\d]", "")));
 
                         // Also grab the user's name.
                         builder.setName(doc.select("title").first().ownText().replaceFirst("'s Profile \\| Scribble Hub", ""));
