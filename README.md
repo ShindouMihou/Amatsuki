@@ -101,7 +101,14 @@ new Amatsuki().getCertainRankings(Rankings.ACTIVITY); // Exactly the same as the
 new Amatsuki().searchUser("Mihou", 30000); // Timeout is in millis.
 ```
 
-#### Known issues
-Here are the currently known issues, if anyone knows the fix, feel free to send a PR.
-
-1. IOException: Underlying Input Stream Returned Zero Bytes. [haven't occurred as of lately]
+#### To use the Search Finder, use the SearchFinder class.
+```java
+// Explanation:
+// IncludeGenre - as the name implies, includes (a) genre(s) to the search, the opposite of this is ExcludeGenre.
+// SetSorting - sets the sorting method for the stories, whether it be Reader count or etc.
+// SetStoryStatus - include only specific story status, by default it is StoryStatus.ALL.
+// ExcludeGenreBy - (this also applies to inclusion), sets whether to exclude, or include the genres through OR or AND (like exclude several genres at once, or etc...).
+// SetAscending - assists in sorting whether it'd be ascending or descending.
+// Build - will build the URL then call, AmatsukiConnector's method to send the results.
+new SearchFinder().includeGenre(Genre.GIRLS_LOVE, Genre.SLICE_OF_LIFE).setSorting(SortBy.READERS).setStoryStatus(StoryStatus.COMPLETED).excludeGenreBy(ExclusionMethod.OR).setAscending(true).build()
+```

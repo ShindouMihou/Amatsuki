@@ -217,7 +217,6 @@ public class SearchFinder {
             }
 
             url.append("&cp=").append(storyStatus.getValue()).append("&sort=").append(sorting.getValue()).append("&order=").append(order ? "asc" : "desc");
-            Logger.getLogger("Amatsuki").log(Level.INFO, "URL built: " + url.toString());
             return new AmatsukiConnector().seriesFinderSearch(url.toString(), timeout);
         }
 
