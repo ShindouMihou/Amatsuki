@@ -6,6 +6,7 @@ public class UserBuilder {
     private int totalSeries = 0;
     private long totalViews = 0L;
     private int totalReviews = 0;
+    private boolean isDisabled = false;
     private int totalReaders = 0;
     private int totalFollowers = 0;
     private String name = "No context.";
@@ -18,6 +19,10 @@ public class UserBuilder {
     private String homepage;
     private int uid;
     private String lastActive;
+
+    public void setDisabled(boolean disabled){
+        this.isDisabled = disabled;
+    }
 
     public void setAvatar(String avatar) {
         this.avatar = avatar;
@@ -85,7 +90,7 @@ public class UserBuilder {
 
     public User build(){
         return new User(uid, totalWords, totalSeries, totalViews, totalReviews, totalReaders, totalFollowers, url, name, bio, avatar,
-                birthday, gender, location, homepage, lastActive);
+                birthday, gender, location, homepage, lastActive, isDisabled);
     }
 
 }

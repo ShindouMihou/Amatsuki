@@ -1,33 +1,32 @@
 package tk.mihou.amatsuki.entities.user;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.Date;
 import java.util.Objects;
 import java.util.Optional;
 
 public class User {
 
-    private long totalWords;
-    private int totalSeries;
-    private long totalViews;
-    private int totalReviews;
-    private int totalReaders;
-    private int totalFollowers;
-    private String url;
-    private String name;
-    private String bio;
-    private String avatar;
-    private String birthday;
-    private String gender;
-    private String location;
-    private int uid;
-    private String homepage;
-    private String lastActive;
+    private final long totalWords;
+    private final int totalSeries;
+    private final long totalViews;
+    private final int totalReviews;
+    private final int totalReaders;
+    private final int totalFollowers;
+    private final String url;
+    private final String name;
+    private final String bio;
+    private final boolean isDisabled;
+    private final String avatar;
+    private final String birthday;
+    private final String gender;
+    private final String location;
+    private final int uid;
+    private final String homepage;
+    private final String lastActive;
 
-    public User(int uid, long totalWords, int totalSeries, long totalViews, int totalReviews, int totalReaders, int totalFollowers, String url, String name, String bio, String avatar, String birthday, String gender, String location, String homepage, String lastActive) {
+    public User(int uid, long totalWords, int totalSeries, long totalViews, int totalReviews, int totalReaders, int totalFollowers,
+                String url, String name, String bio, String avatar, String birthday, String gender, String location, String homepage, String lastActive, boolean isDisabled) {
         this.uid = uid;
         this.totalWords = totalWords;
         this.totalSeries = totalSeries;
@@ -42,8 +41,17 @@ public class User {
         this.birthday = birthday;
         this.gender = gender;
         this.location = location;
+        this.isDisabled = isDisabled;
         this.homepage = homepage;
         this.lastActive = lastActive;
+    }
+
+    /**
+     * Checks if the user has disabled their profile.
+     * @return has the user disabled their profile?
+     */
+    public boolean isDisabled(){
+        return isDisabled;
     }
 
     /**

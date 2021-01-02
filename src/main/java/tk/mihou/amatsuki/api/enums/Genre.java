@@ -45,8 +45,8 @@ public enum Genre {
     SPORTS(916,"As the name suggests, story with sports as one of its main element. Baseball, basketball, hockey, soccer, golf, and racing just to name a few."),
     TRAGEDY(901,"Contains events resulting in great loss and misfortune.");
 
-    private int id;
-    private String description;
+    private final int id;
+    private final String description;
 
     Genre(int id, String description) {
         this.id = id;

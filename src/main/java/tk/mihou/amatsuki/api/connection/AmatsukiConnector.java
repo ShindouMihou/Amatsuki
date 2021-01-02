@@ -6,8 +6,6 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import tk.mihou.amatsuki.api.enums.OrderBy;
 import tk.mihou.amatsuki.api.enums.Rankings;
-import tk.mihou.amatsuki.api.enums.SortBy;
-import tk.mihou.amatsuki.api.enums.StoryStatus;
 import tk.mihou.amatsuki.entities.latest.LatestUpdatesBuilder;
 import tk.mihou.amatsuki.entities.latest.LatestUpdatesResult;
 import tk.mihou.amatsuki.entities.story.Story;
@@ -33,25 +31,7 @@ import java.util.logging.Logger;
 public class AmatsukiConnector {
 
     private final ExecutorService executorService = Executors.newSingleThreadExecutor();
-    private String userAgent = "Amatsuki-library/1.2.5r1 (Language=Java/1.8)";
-
-    /*
-    - Amatsuki Connector, the base connector for all.
-    v 1.0.0-SNAPSHOT.
-
-    The methods used here are not at its best, but they function as expected which is what I want.
-    If you wish to improve upon this, please do so.
-
-    Search Story
-    - The method here, searches first for the thumbnails then saves them on an ArrayList (not static) for collecting later
-    as the thumbnails are stored on a different divider from the other stuff.
-    - After storing the thumbnails, the short information of the stories will then be collected and stored on a class
-    called ShortStory which is a summary version of Story, it has a method to transform itself into a Story class.
-
-    Search User.
-    - The method here collects all the results from the user results (on the side of when you search for a story/user on SH).
-    - It is limited as one would expect, but it does the job right.
-     */
+    private String userAgent = "Amatsuki-library/1.2.6r1 (Language=Java/1.8)";
 
     /**
      * Modifies the user-agent of the client, can be anything but I recommend not abusing, as well as using the right
@@ -70,6 +50,7 @@ public class AmatsukiConnector {
                         .referrer("https://scribblehub.com")
                         .userAgent(userAgent)
                         .timeout(timeout).get();
+
                 doc.getElementsByClass("sb_box search").forEach(element -> element.getElementsByClass("s_user_link").forEach(resultA -> resultA.getElementsByClass("s_user_results").forEach(results -> {
                     UserResultBuilder builder = new UserResultBuilder();
                     Element e = results.getElementsByClass("sur_image").first().getElementsByTag("img").first();
@@ -427,6 +408,39 @@ public class AmatsukiConnector {
                         .referrer("https://scribblehub.com")
                         .userAgent(userAgent)
                         .timeout(timeout).get();
+
+                // Validate is user has disabled their profile.
+                if(doc.getElementsByClass("error_msg_profile").first() != null){
+                    if(doc.getElementsByClass("error_msg_profile").first().ownText().contains("disable their profile.")){
+                        // Grab the UID (since this is important) for RSS.
+                        builder.setUID(Integer.parseInt(doc.select("link[rel='canonical']").first().attr("href").replaceAll("https://www.scribblehub.com/profile/", "").replaceAll("/", "")));
+
+                        // Also grab the user's name.
+                        builder.setName(doc.select("title").first().ownText().replaceFirst("'s Profile \\| Scribble Hub", ""));
+
+                        // Default all the data.
+                        builder.setHomepage("Disabled");
+                        builder.setLocation("Disabled");
+                        builder.setBirthday("Disabled");
+                        builder.setBio("This user has disabled their profile.");
+                        builder.setLastActive("Disabled");
+                        builder.setGender("Disabled");
+                        builder.setDisabled(true);
+                        builder.setAvatar("https://cdn.scribblehub.com/default/avatar.jpg");
+                        builder.setUrl(url);
+
+                        // Default all the statistic numbers.
+                        builder.setTotalViews(0);
+                        builder.setTotalFollowers(0);
+                        builder.setTotalReaders(0);
+                        builder.setTotalReviews(0);
+                        builder.setTotalSeries(0);
+                        builder.setTotalWords(0);
+
+                        return builder.build();
+                    }
+                }
+
                 // Collects the perfect bio, since whitespace is killed by Jsoup, we simply add '\n' after every <p>.
                 StringBuilder bio = new StringBuilder();
                 doc.getElementsByClass("user_bio_profile").first().getElementsByTag("p").forEach(element ->
@@ -465,6 +479,7 @@ public class AmatsukiConnector {
 
                 // Retrieve UID.
                 builder.setUID(Integer.parseInt(metad.select("input[name='authorid']").first().attr("value")));
+
                 // Sets the URL.
                 builder.setUrl(url);
                 return builder.build();
