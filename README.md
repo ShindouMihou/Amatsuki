@@ -112,3 +112,5 @@ new Amatsuki().searchUser("Mihou", 30000); // Timeout is in millis.
 // Build - will build the URL then call, AmatsukiConnector's method to send the results.
 new SearchFinder().includeGenre(Genre.GIRLS_LOVE, Genre.SLICE_OF_LIFE).setSorting(SortBy.READERS).setStoryStatus(StoryStatus.COMPLETED).excludeGenreBy(ExclusionMethod.OR).setAscending(true).build()
 ```
+
+##### It is recommended to check if the user has disabled their profile when querying for user. (there is a method for it, `isDisabled()`)
