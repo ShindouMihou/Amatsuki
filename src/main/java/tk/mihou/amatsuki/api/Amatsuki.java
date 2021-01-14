@@ -3,6 +3,7 @@ package tk.mihou.amatsuki.api;
 import tk.mihou.amatsuki.api.connection.AmatsukiConnector;
 import tk.mihou.amatsuki.api.enums.OrderBy;
 import tk.mihou.amatsuki.api.enums.Rankings;
+import tk.mihou.amatsuki.entities.ForumThread;
 import tk.mihou.amatsuki.entities.latest.LatestUpdatesResult;
 import tk.mihou.amatsuki.entities.story.Story;
 import tk.mihou.amatsuki.entities.story.lower.StoryResults;
@@ -33,6 +34,23 @@ public class Amatsuki {
      */
     public CompletableFuture<List<UserResults>> searchUser(String query) {
         return connector.searchUser(query, defTimeout);
+    }
+
+    /**
+     * Retrieves the latest topics from ScribbleHub frontpage.
+     * @return the latest topics from the frontpage.
+     */
+    public CompletableFuture<List<ForumThread>> getLatestTopics(){
+        return connector.getLatestTopics(defTimeout);
+    }
+
+    /**
+     * Retrieves the latest topics from ScribbleHub frontpage.
+     * @param timeout the timeout in millis.
+     * @return the latest topics from the frontpage.
+     */
+    public CompletableFuture<List<ForumThread>> getLatestTopics(int timeout){
+        return connector.getLatestTopics(timeout);
     }
 
     /**

@@ -6,6 +6,7 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import tk.mihou.amatsuki.api.enums.OrderBy;
 import tk.mihou.amatsuki.api.enums.Rankings;
+import tk.mihou.amatsuki.entities.ForumThread;
 import tk.mihou.amatsuki.entities.latest.LatestUpdatesBuilder;
 import tk.mihou.amatsuki.entities.latest.LatestUpdatesResult;
 import tk.mihou.amatsuki.entities.story.Story;
@@ -181,6 +182,26 @@ public class AmatsukiConnector {
             }
             return null;
         }, executorService);
+    }
+
+    public CompletableFuture<List<ForumThread>> getLatestTopics(int timeout){
+        return CompletableFuture.supplyAsync(() -> {
+            try {
+                Document doc = Jsoup.connect("https://scribblehub.com/").userAgent(userAgent).timeout(timeout).get();
+                List<ForumThread> threads = new ArrayList<>();
+                doc.getElementsByClass("site").first().getElementsByClass("site-content-contain").first().getElementsByClass("wi_fic_wrap slider")
+                        .first().getElementById("tp_latest").getElementsByTag("tr").forEach(element -> {
+                            // Adds a new thread.
+                            threads.add(new ForumThread(element.getElementsByTag("td").first().getElementsByTag("a").first().ownText(),
+                                    element.getElementsByTag("td").last().ownText(),
+                                    element.getElementsByTag("td").first().getElementsByTag("a").attr("href")));
+                });
+                return threads;
+            } catch (IOException e) {
+                Logger.getLogger("Amatsuki").log(Level.SEVERE, "Amatsuki: https://scribblehub.com returned: " + e.getMessage());
+            }
+            return null;
+        });
     }
 
     public CompletableFuture<List<StoryResults>> getLatestSeries(int timeout){
