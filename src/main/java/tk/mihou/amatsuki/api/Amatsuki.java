@@ -9,8 +9,11 @@ import tk.mihou.amatsuki.entities.story.Story;
 import tk.mihou.amatsuki.entities.story.lower.StoryResults;
 import tk.mihou.amatsuki.entities.user.User;
 import tk.mihou.amatsuki.entities.user.lower.UserResults;
+import tk.mihou.amatsuki.impl.cache.CacheManager;
+
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.TimeUnit;
 
 public class Amatsuki {
 
@@ -24,6 +27,40 @@ public class Amatsuki {
      */
     public Amatsuki setUserAgent(String userAgent){
         connector.setUserAgent(userAgent);
+        return this;
+    }
+
+    /**
+     * Sets the status of the CacheManager whether to enable
+     * or to disable the CacheManager (recommended enabled since
+     * it is only for stories and users, excluding search).
+     *
+     * By default, the CacheManager is already enabled to reduce
+     * the load on ScribbleHub's side.
+     *
+     * @param enabled do you want to enable/disable CacheManager?
+     * @return Amatsuki.
+     */
+    public Amatsuki setCache(boolean enabled){
+        CacheManager.switchStatus(enabled);
+        return this;
+    }
+
+    /**
+     * Sets the cache lifespan of an entity, in other words, changes
+     * the time before the cache is considered invalid and be removed
+     * from the cache.
+     *
+     * The default value is 1 hour because stories don't really update that
+     * much unless the creator themselves force update SH's cache which happens
+     * a lot which is why we went with one hour.
+     *
+     * @param lifespan the lifepsan.
+     * @param unit the time unit to use.
+     * @return Amatsuki
+     */
+    public Amatsuki setLifespan(int lifespan, TimeUnit unit){
+        CacheManager.setLifespan(lifespan, unit);
         return this;
     }
 
@@ -175,6 +212,15 @@ public class Amatsuki {
      * @return Story.
      */
     public CompletableFuture<Story> getStoryFromUrl(String url) {
+        if(CacheManager.enabled.get()){
+            if(CacheManager.isCached(url)){
+                    Story result = CacheManager.getCache(Story.class, url);
+                    if(result != null) {
+                        return CompletableFuture.supplyAsync(() -> result);
+                    }
+            }
+        }
+
         return connector.getStoryByUrl(url, defTimeout);
     }
 
@@ -184,6 +230,15 @@ public class Amatsuki {
      * @return User.
      */
     public CompletableFuture<User> getUserFromUrl(String url) {
+        if(CacheManager.enabled.get()){
+            if(CacheManager.isCached(url)){
+                User result = CacheManager.getCache(User.class, url);
+                if(result != null){
+                    return CompletableFuture.supplyAsync(() -> result);
+                }
+            }
+        }
+
         return connector.getUserFromUrl(url, defTimeout);
     }
 
@@ -214,6 +269,15 @@ public class Amatsuki {
      * @return Story.
      */
     public CompletableFuture<Story> getStoryFromUrl(String url, int timeout) {
+        if(CacheManager.enabled.get()){
+            if(CacheManager.isCached(url)){
+                Story result = CacheManager.getCache(Story.class, url);
+                if(result != null) {
+                    return CompletableFuture.supplyAsync(() -> result);
+                }
+            }
+        }
+
         return connector.getStoryByUrl(url, timeout);
     }
 
@@ -224,6 +288,15 @@ public class Amatsuki {
      * @return User.
      */
     public CompletableFuture<User> getUserFromUrl(String url, int timeout) {
+        if(CacheManager.enabled.get()){
+            if(CacheManager.isCached(url)){
+                User result = CacheManager.getCache(User.class, url);
+                if(result != null){
+                    return CompletableFuture.supplyAsync(() -> result);
+                }
+            }
+        }
+
         return connector.getUserFromUrl(url, timeout);
     }
 }

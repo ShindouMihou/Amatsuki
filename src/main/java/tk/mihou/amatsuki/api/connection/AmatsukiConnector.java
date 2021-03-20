@@ -17,6 +17,8 @@ import tk.mihou.amatsuki.entities.user.lower.UserResults;
 import tk.mihou.amatsuki.entities.user.lower.UserResultBuilder;
 import tk.mihou.amatsuki.entities.user.User;
 import tk.mihou.amatsuki.entities.user.UserBuilder;
+import tk.mihou.amatsuki.impl.cache.CacheManager;
+
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
@@ -32,7 +34,7 @@ import java.util.logging.Logger;
 public class AmatsukiConnector {
 
     private final ExecutorService executorService = Executors.newSingleThreadExecutor();
-    private String userAgent = "Amatsuki-library/1.2.6r2 (Language=Java/1.8)";
+    private String userAgent = "Amatsuki-library/1.2.8r1 (Language=Java/1.8)";
 
     /**
      * Modifies the user-agent of the client, can be anything but I recommend not abusing, as well as using the right
@@ -414,6 +416,9 @@ public class AmatsukiConnector {
                 // I wonder why I was getting the URL when there is already a URL provided?
                 entity.setUrl(url);
 
+                // Add to cache.
+                CacheManager.addCache(entity.build(), url);
+
                 return entity.build();
             } catch (IOException ignore) {
             }
@@ -457,6 +462,9 @@ public class AmatsukiConnector {
                         builder.setTotalReviews(0);
                         builder.setTotalSeries(0);
                         builder.setTotalWords(0);
+
+                        // Add to cache.
+                        CacheManager.addCache(builder.build(), url);
 
                         return builder.build();
                     }
@@ -503,6 +511,10 @@ public class AmatsukiConnector {
 
                 // Sets the URL.
                 builder.setUrl(url);
+
+                // Add to cache.
+                CacheManager.addCache(builder.build(), url);
+
                 return builder.build();
             } catch (IOException ignore) {
             }
