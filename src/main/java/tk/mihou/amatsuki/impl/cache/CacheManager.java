@@ -29,7 +29,6 @@ public class CacheManager {
     public static <T> T getCache(Class expected, String key){
         if(genericCache.containsKey(key)){
             if(genericCache.get(key).sameType(expected)){
-                System.out.println("We are now returning the value from cache.");
                 return (T) genericCache.get(key).get();
             }
         }
