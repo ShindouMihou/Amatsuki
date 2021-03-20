@@ -379,7 +379,7 @@ public class AmatsukiConnector {
 
                 // Retrieving the genres.
                 List<String> genres = new ArrayList<>();
-                details.getElementsByClass("wi_fic_genre").first().getElementsByTag("span").forEach(element -> genres.add(element.getElementsByClass("fic_genre").first().ownText()));
+                details.getElementsByClass("wi_fic_genre").first().getElementsByClass("fic_genre").forEach(element -> genres.add(element.ownText()));
 
                 // Retrieving the tags.
                 List<String> tags = new ArrayList<>();
