@@ -1,4 +1,7 @@
 [![](https://jitpack.io/v/pw.mihou/amatsuki.svg)](https://jitpack.io/#pw.mihou/amatsuki)
+
+***(The tag above may be outdated because I messed up on a certain release: please use 1.2.9r1)***
+
 # Amatsuki
 
 Amatsuki is an asychronous simple text scraper for ScribbleHub built in Java, the main purpose for this library is to scrape public user data (bio, followed by x users, etc...) , or story data (synopsis, story title, thumbnail, etc...) from the https://scribblehub.com site.
