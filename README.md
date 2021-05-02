@@ -1,4 +1,4 @@
-[![](https://jitpack.io/v/ShindouMihou/amatsuki.svg)](https://jitpack.io/#ShindouMihou/amatsuki)
+[![](https://jitpack.io/v/pw.mihou/amatsuki.svg)](https://jitpack.io/#pw.mihou/amatsuki)
 # Amatsuki
 
 Amatsuki is an asychronous simple text scraper for ScribbleHub built in Java, the main purpose for this library is to scrape public user data (bio, followed by x users, etc...) , or story data (synopsis, story title, thumbnail, etc...) from the https://scribblehub.com site.
@@ -22,7 +22,7 @@ As of now, the only way to get this is through Jitpack which is still a simple w
 #### Step 2. Add the dependency
 ```
 	<dependency>
-	    <groupId>com.github.ShindouMihou</groupId>
+	    <groupId>pw.mihou</groupId>
 	    <artifactId>amatsuki</artifactId>
 	    <version>Tag</version>
 	</dependency>
@@ -41,7 +41,7 @@ As of now, the only way to get this is through Jitpack which is still a simple w
 #### Step 2. Add the dependency:
 ```
 	dependencies {
-	        implementation 'com.github.ShindouMihou:amatsuki:Tag'
+	        implementation 'pw.mihou:amatsuki:Tag'
 	}
   ```
   
