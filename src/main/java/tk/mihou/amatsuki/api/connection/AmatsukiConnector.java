@@ -4,6 +4,7 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
+import tk.mihou.amatsuki.api.enums.AmatsukiNames;
 import tk.mihou.amatsuki.api.enums.OrderBy;
 import tk.mihou.amatsuki.api.enums.Rankings;
 import tk.mihou.amatsuki.entities.ForumThread;
@@ -18,6 +19,7 @@ import tk.mihou.amatsuki.entities.user.lower.UserResultBuilder;
 import tk.mihou.amatsuki.entities.user.User;
 import tk.mihou.amatsuki.entities.user.UserBuilder;
 import tk.mihou.amatsuki.impl.cache.CacheManager;
+import tk.mihou.amatsuki.impl.cache.enums.CacheTypes;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
@@ -34,7 +36,8 @@ import java.util.logging.Logger;
 public class AmatsukiConnector {
 
     private final ExecutorService executorService = Executors.newSingleThreadExecutor();
-    private String userAgent = "Amatsuki-library/1.2.8r1 (Language=Java/1.8)";
+    private String userAgent = "Amatsuki-library/1.2.9r1 (Language=Java/1.8)";
+    private String referrer = "https://manabot.fun/hello.html";
 
     /**
      * Modifies the user-agent of the client, can be anything but I recommend not abusing, as well as using the right
@@ -43,6 +46,15 @@ public class AmatsukiConnector {
      */
     public void setUserAgent(String userAgent){
         this.userAgent = userAgent;
+    }
+
+    /**
+     * Sets the referrer, default: https://manabot.fun/hello.html
+     * we will only set the referrer for story pages because of the new referrer statistic.
+     * @param referrer the referrer to use.
+     */
+    public void setReferrer(String referrer){
+        this.referrer = referrer;
     }
 
     public CompletableFuture<List<UserResults>> searchUser(String query, int timeout){
@@ -62,6 +74,11 @@ public class AmatsukiConnector {
                     builder.setLink(resultA.attr("href"));
                     collection.add(builder.build());
                 })));
+
+                if(CacheManager.search.get()){
+                    CacheManager.addCache(collection, String.format(AmatsukiNames.USER_SEARCH.getFormat(), query), CacheTypes.SEARCH);
+                }
+
                 return collection;
             } catch (IOException ignore) {
             }
@@ -123,6 +140,11 @@ public class AmatsukiConnector {
                     builder.setAuthorURL(stats.getElementsByTag("span").last().getElementsByTag("span").first().getElementsByTag("a").first().attr("href"));
                     stories.add(builder.build());
                 });
+
+                if(CacheManager.search.get()){
+                    CacheManager.addCache(stories, String.format(AmatsukiNames.SERIES_FINDER.getFormat(), url), CacheTypes.SEARCH);
+                }
+
                 return stories;
             } catch (IOException ignore) {
             }
@@ -178,6 +200,11 @@ public class AmatsukiConnector {
                     builder.setAuthorURL(stats.getElementsByTag("span").last().getElementsByTag("span").first().getElementsByTag("a").first().attr("href"));
                     panels.add(builder.build());
                 });
+
+                if(CacheManager.rankings.get()){
+                    CacheManager.addCache(panels, String.format(AmatsukiNames.RANKINGS.getFormat(), ranking.getIdentifier(), order.getLocation()), CacheTypes.RANKINGS);
+                }
+
                 return panels;
             } catch (IOException e) {
                 Logger.getLogger("Amatsuki").log(Level.SEVERE, "Amatsuki: https://scribblehub.com returned: " + e.getMessage());
@@ -254,6 +281,11 @@ public class AmatsukiConnector {
                     builder.setAuthorURL(stats.getElementsByTag("span").last().getElementsByTag("span").first().getElementsByTag("a").first().attr("href"));
                     panels.add(builder.build());
                 });
+
+                if(CacheManager.rankings.get()){
+                    CacheManager.addCache(panels, AmatsukiNames.LATEST_SERIES.getFormat(), CacheTypes.RANKINGS);
+                }
+
                 return panels;
             } catch (IOException e) {
                 Logger.getLogger("Amatsuki").log(Level.SEVERE, "Amatsuki: https://scribblehub.com returned: " + e.getMessage());
@@ -298,6 +330,11 @@ public class AmatsukiConnector {
                     builder.setLastUpdate(body.getElementsByTag("div").last().ownText().replaceFirst(", ", ""));
                     results.add(builder.build());
                 });
+
+                if(CacheManager.rankings.get()){
+                    CacheManager.addCache(results, AmatsukiNames.LATEST_UPDATES.getFormat(), CacheTypes.RANKINGS);
+                }
+
                 return results;
             } catch (IOException e) {
                 Logger.getLogger("Amatsuki").log(Level.SEVERE, "Amatsuki: https://scribblehub.com returned: " + e.getMessage());
@@ -355,6 +392,11 @@ public class AmatsukiConnector {
                     builder.setAuthorURL(stats.getElementsByTag("span").last().getElementsByTag("span").first().getElementsByTag("a").first().attr("href"));
                     stories.add(builder.build());
                 });
+
+                if(CacheManager.search.get()){
+                    CacheManager.addCache(stories, String.format(AmatsukiNames.STORY_SEARCH.getFormat(), query), CacheTypes.SEARCH);
+                }
+
                 return stories;
             } catch (IOException ignore) {
             }
@@ -368,7 +410,7 @@ public class AmatsukiConnector {
                 StoryBuilder entity = new StoryBuilder();
                 // Connects to the URL.
                 Document doc = Jsoup.connect(url)
-                        .referrer("https://scribblehub.com")
+                        .referrer(referrer)
                         .userAgent(userAgent)
                         .timeout(timeout).get();
 
@@ -417,7 +459,9 @@ public class AmatsukiConnector {
                 entity.setUrl(url);
 
                 // Add to cache.
-                CacheManager.addCache(entity.build(), url);
+                if(CacheManager.enabled.get()){
+                    CacheManager.addCache(entity.build(), url);
+                }
 
                 return entity.build();
             } catch (IOException ignore) {
@@ -464,7 +508,9 @@ public class AmatsukiConnector {
                         builder.setTotalWords(0);
 
                         // Add to cache.
-                        CacheManager.addCache(builder.build(), url);
+                        if(CacheManager.enabled.get()) {
+                            CacheManager.addCache(builder.build(), url);
+                        }
 
                         return builder.build();
                     }
@@ -513,7 +559,9 @@ public class AmatsukiConnector {
                 builder.setUrl(url);
 
                 // Add to cache.
-                CacheManager.addCache(builder.build(), url);
+                if(CacheManager.enabled.get()){
+                    CacheManager.addCache(builder.build(), url);
+                }
 
                 return builder.build();
             } catch (IOException ignore) {

@@ -2,16 +2,23 @@ package tk.mihou.amatsuki.api.enums;
 
 public enum Rankings {
 
-    RISING(5), READERS(4), POPULARITY(1), FAVORITES(2), ACTIVITY(3);
+    RISING(5, "RISING-AMATSUKI"), READERS(4, "READERS-AMATSUKI"),
+    POPULARITY(1, "POPULARITY-AMATSUKI"), FAVORITES(2, "FAVORITES-AMATSUKI"), ACTIVITY(3, "ACTIVITY-AMATSUKI");
 
-    private int location;
+    private final int location;
+    private final String identifier;
 
-    Rankings(int location){
+    Rankings(int location, String identifier){
         this.location = location;
+        this.identifier = identifier;
     }
 
     public int getLocation(){
         return location;
+    }
+
+    public String getIdentifier(){
+        return identifier;
     }
 
 }
