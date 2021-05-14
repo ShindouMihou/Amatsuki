@@ -18,6 +18,12 @@ public class CacheEntity<T> {
         this.expected = System.currentTimeMillis() + CacheManager.unit.toMillis(CacheManager.lifespan.get());
     }
 
+    public CacheEntity(T entity, String key, int lifespan, TimeUnit unit){
+        this.entity = entity;
+        this.key = key;
+        this.expected = System.currentTimeMillis() + unit.toMillis(lifespan);
+    }
+
     public CacheEntity(List<T> entity, String key){
         this.list = entity;
         this.key = key;
@@ -28,6 +34,12 @@ public class CacheEntity<T> {
         this.list = entity;
         this.key = key;
         this.expected = System.currentTimeMillis() + CacheManager.unit.toMillis(lifespan);
+    }
+
+    public CacheEntity(List<T> entity, String key, int lifespan, TimeUnit unit){
+        this.list = entity;
+        this.key = key;
+        this.expected = System.currentTimeMillis() + unit.toMillis(lifespan);
     }
 
     /**
