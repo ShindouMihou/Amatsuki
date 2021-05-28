@@ -64,6 +64,17 @@ public class CacheManager {
         genericCache.put(key, new CacheEntity<>(entity, key, type.equals(CacheTypes.RANKINGS) ? ranking.get() : lifespan.get()));
     }
 
+    // Added in case we will need it in the future.
+    public static void addCache(List<?> entity, String key, int lifespan, TimeUnit unit){
+        genericCache.put(key, new CacheEntity<>(entity, key, lifespan, unit));
+    }
+
+    // Added for Amelia's special circumstances.
+    public static <T> T addCache(T entity, String key, int lifespan, TimeUnit unit){
+        genericCache.put(key, new CacheEntity<>(entity, key, lifespan, unit));
+        return entity;
+    }
+
     public static <T> T replace(T entity, String key){
         if(genericCache.containsKey(key)){
             genericCache.get(key).replace(entity);
