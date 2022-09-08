@@ -1,6 +1,7 @@
-[![](https://jitpack.io/v/pw.mihou/amatsuki.svg)](https://jitpack.io/#pw.mihou/amatsuki)
-
-***(The tag above may be outdated because I messed up on a certain release: please use 1.2.9r1)***
+> **Warning**
+>
+> This library has been completely replaced by the more improved and better Kotlin-based library [Amaririsu](https://github.com/ShindouMihou/Amaririsu).
+> You shouldn't use this library at all and instead prefer to use the above if needed.
 
 # Amatsuki
 
